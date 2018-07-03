@@ -99,7 +99,7 @@ Deuxieme étape installation de kubernetes. Lancer la commande vagrant ci-dessou
 $ vagrant provision --provision-with clusterkube
 ----
 
-Si tous s'est bien déroulé vous devrier obtenir les fichiers supplémentaire ci-dessous surligner en rouge:
+Si tous s'est bien déroulé vous devriez obtenir les fichiers supplémentaire ci-dessous surligner en rouge:
 
 [source, shell,linenums]
 ----
