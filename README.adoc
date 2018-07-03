@@ -21,10 +21,6 @@ endif::[]
 :pygments-linenums-mode: inline
 
 
-____
-At an abstract level, a deployment pipeline is an automated manifestation of your process for getting software from version control into the hands of your users.
-____
-
 [Abstract]
 == Abstract
 
