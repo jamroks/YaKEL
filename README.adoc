@@ -2,37 +2,29 @@
 :title-logo-image: image: images_dir [scaledwidth=70%,align=center]
 = SPINNAKER: Cloud Control Pipeline Part II
 René Okouya Mbongo <rene.okouya@wescale.fr>
+:imagesdir: images
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+:imagesdir: images
+endif::[]
 :doctype: article
-// Settings:
-:compat-mode:
-//:numbered:
-//:sectnums:
-//:specialnumbered:
 :experimental:
 :listing-caption: extrait
-:imagesdir: images
 :toc:
 :toc-placement!:
-//:toc-placement: preambule
 :icons: font
-:toclevels: 3
-:toc-title: Sommaire
-#:pygments-style: manni
 :source-highlighter: pygments
 :pygments-linenums-mode: inline
 
-// ifdef::backend-pdf[]
-// :pagenums:
-// :pygments-style: bw
-// :source-highlighter: pygments
-// #:source-highlighter: coderay
-// endif::[]
 
 
 
 
-
-[ IMAGE : LOGO Kubernetes ]
+#image::kubernetes.png[kubernetes logo]
 
 
 [quote, Jez Humble, Continuous Delivery: Reliable Software Releases through Build; Test; and Deployment Automation]
@@ -44,8 +36,6 @@ ____
 [Abstract]
 == Abstract
 
-Dans un précedent article "Spinnaker : Cloud native continuous delivery pipeline" j'ai presenté une vue d'ensemble du déploiement continue dans le cloud selon Spinnaker. 
-Nous allons maintenant passer à la mise en pratique dans une série d'articles qui nous mènerons de l'installation de spinnaker en local jusqu'au déploiement multicoud. Le focus du présent billet concerne l'installation du cluster. Kubernetes sera notre terrain de jeu, et afin de partir du même pied, je vous porpose "Yakil".
 Yakil ( Yet Another Kubernetes Environment Lab) est un projet ansible playbook léger pour l'installation rapide (en moins de 10 minutes) d'un lab kubernetes de 3 noeuds pouvant tenir sur un laptop, que j'ai réalisé pour mes propres besoins ( experimentation etc ...). Le cluster kubernetes est tres configurable et nécéssite les pre-requis suivant :
 
 
@@ -71,132 +61,6 @@ WARNING: Attention particulière: bien que faisable, l'empreinte mémoire d'un c
       VAGRANT --> ANSIBLE --> KUBERNETES {  master et 2 worker }
 
 
-== Configuration: 
-
-Pour la configuration, j'ai regroupé dans le fichier clustervars.yml l'ensemble des paramèttres dont vagrant, ansible et kubernetes se servirons lors des phases de provisioning vagrant up, playbook run ansible et bootstrap de kubernestes, manière d'etre dans la philosophie  "DRY" (Don't Repeat Yourself) et d'eviter un peu l'effet "WET" (Waste Everyone's Time) y compris pour moi :) .
-Je vais donc vous décrire les blocs de configurations qui ont leur importance pour la suite des actions.
-
-Dans ce premier bloc, c'est la définitions des noeuds ( instance de vm) de notre cluster et les roles que chacun se voit attribués.
-
-
-[source, yaml,linenums]
-----
-ingress:                    
-    edge:
-      route: apps.roklab.ops <1>
-      address: 192.168.32.8
-      nodename: node05
-
-### -- kubernetes / ansible extra vars / vagrant box variables
-server:
-    etcd: ## etcd is for ansible only. etcd is on same vm as master <2>
-        nodes:
-        - nodename: wakanda
-          fqdn: 'wakanda.roklab.ops'
-          vagrant_enabled: false # no need to create the etcd vm
-          ip: 192.168.32.7
-    controlplane:           
-        nodes:
-        - nodename: wakanda
-          fqdn: 'wakanda.roklab.ops' <3>
-          aliases: 'wakanda'
-          vagrant_enabled: true
-          ip: 192.168.32.7
-          cpu: 2
-          ram: 2048
-    worker:                 
-        nodes:
-        - nodename: node05
-          fqdn: 'node05.roklab.ops' <4>
-          aliases: node05 
-          vagrant_enabled: true
-          ip: 192.168.32.8
-          cpu: 1
-          ram: 1024
-        - nodename: node06
-          fqdn: 'node06.roklab.ops'
-          aliases: node06
-          vagrant_enabled: true
-          ip: 192.168.32.9
-          cpu: 1
-          ram: 1024
-----
-<1> Ingress: permet l'accès à de l' applicatif via des url du type *.apps.roklab.ops ( *.apps.votre.fake.domain.local).
-    Sachant que n'importe quel noeud peu assumer le role d'ingress ( même le master).
-<2> etcd : pour le "cluster state" deployé sur le même noeud que le master; à cet effet, noté la présence du paramèttre "vagrant_enabled: false". J'ai implémenté une logique de "skip" dans le fichier Vagrantfile lorsque ce param est à "true" indique à vagrant de ne pas creer de VM.
-<3> controlplane: le noeud de déploiement de l'apiserver, scheduler, controller manager. "vagrant_enabled: true" indique la creation d'une vm vagrant.
-<4> worker: ces noeuds auront le role de worker principalement et au choix le role d'ingress comme noté au point <1>
-
-
-
-Dans ce deuxieme bloc, le provisionner ansible vagrant est definis pour l'execution des playbook, 
-
-
-[source, yaml,linenums]
-----
-provisioner:
-    type: 'ansible'
-    limit: "ROK8LABZ:localhost"
-    extra_vars: 'clustervars.yml'       <1>
-    verbose: "vv"
-    config_file: 'provisioning/ansible.cfg'
-    play:
-      clusterplan: 'provisioning/clusterplan.yml' <2>
-      clusterkube: 'provisioning/clusterkube.yml' <3>
-      clusterapps: 'provisioning/clusterapps.yml' <4>
-    tags:
-      plan: ["nmcli", "ipvs", "ntp", "hosts", "repo", "sysctl", "yum"]
-      kube: ["controlplane", "certs", "certs_upload", "worker", "network", "dns", "kubeconfig"]
-      apps: ["heapster", "dashboard", "traefik"]
-----
-<1> vagrant passera le fichier clustervars.yml sous forme d'extra_vars au provisionner ansible
-<2> clusterplan: ce playbook installe des packages et configure l'os de sorte a améliorer l'experience vagrant + kube + centos
-<3> clusterkube: ce playbook lance l'installation de tous les composants kube : controlplane, worker, network, dns
-<4> clusterapps: ce playbook installe des applications dans le cluster kube tel que : traefik, heapster, dashboard .
-
-README.adoc
-Ce troisième bloc, permet de définir les variables classic d'ansible.
-
-
-[source, yaml,linenums]
-----
-ansible_groups: {                           <1>
-    ROK8LABZ: ["wakanda", "node05", "node06"],
-    'ROK8LABZ:children': ["cluster", "etcd", "storage", "ingress"],
-    'ROK8LABZ:vars': { ansible_become: true, ansible_user: 'vagrant' },
-    'cluster:children': ["controlplane", "worker"],
-    'cluster:vars': { docker_version:  '18.03.0', authorization_modes: ['RBAC', 'Node'] },
-    controlplane: ["wakanda"],
-    'controlplane:vars': { secure_port: '6443', insecure_port: '8080' },
-    worker: ["node05", "node06"],
-    etcd: ["wakanda"],
-    storage: ["wakanda"],
-    ingress: ["node05"]
-}
-ansible_host_vars: {                        <2>
-            wakanda: { prefered_iface: '192.168.32.7', prefered_device: 'eth1'},
-            node05: { prefered_iface: '192.168.32.8', prefered_device: 'eth1'},        
-            node06: { prefered_iface: '192.168.32.9', prefered_device: 'eth1'}
-}
-----
-<1> ansible_groups : pas la peine de presentez ce paramettre qui definit les group_vars d'ansible.
-<2> ansible_host_vars: de meme ici le paramettre parle de lui meme, avec les host_vars d'ansible.
-
-
-J'en termine avec ce petit bloc de config qui concerne kubernetes. Ici je précise les éléments qui impactent globalement le cluster kube, tel que le range d'ip pour l'adressage des pods et des services, avec respectivement les variables "pod_cidr_address" et "service_cidr_address".  J'indique également la version de kubernetes à dépoyer et l'ip du service dns fournit dans cette configuration par coreDNS.
-
-[source,yaml,linenums]
-----
-cluster:
-    name: "local"
-    domain: "cluster.local"
-    kubernetes_version: 'v1.10.0'
-    networking:
-          pod_cidr_address: "172.16.0.0/16"
-          service_cidr_address: "172.20.0.0/16"
-          dns_service_ip: "172.20.0.2"
-----
-
 == Hands-On :
 
 première étape, activé l'environement virtualenv et installation d'ansible. Pour ce faire, recuperer les sources depuis github à partir du lien suivant https://github.com/kubernetes/kubernetes.git[YAKEL]
@@ -204,7 +68,6 @@ première étape, activé l'environement virtualenv et installation d'ansible. P
 ==== setupEnv
 
 .git clone & source virtualenv
-
 [source, shell,linenums]
 ----
 $ git clone "https://github.com/jamroks/yakel.git"
