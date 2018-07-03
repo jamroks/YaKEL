@@ -59,7 +59,18 @@ $ source setenv.sh
 
 === ClusterLaunch
 
-Les trois neouds de mon cluster, composé d'un master et deux workers, peuvent etre lancer en une seul étape, pour les impatients étape via la commande vagrant habituel "_vagrant up_". Par soucis de clarté je vais décomposé les étapes en commandes
+Le provisioning des trois noeuds du cluster, composé d'un master et deux workers, peut se faire en une seul étape, pour les impatients il suffit de lancer la commande vagrant habituel 
+
+[source,ruby]
+----
+vagrant up
+----
+
+Par soucis de clarté je vais décomposé les étapes en 3 commandes: 
+
+- clusterplan
+- clusterkube
+- clusterapps
 
 ==== ClusterPlan
 
@@ -137,8 +148,6 @@ $ ./kubectl --kubeconfig kubectl.kubeconfig cluster-infos <1>
 ====
 
 
-
-
 ==== ClusterApps
 
 Troisième étape, installation des apps kubernetes, ici traefik ( l'ingress controller) et le dashboard kubernetes sont les deux apps de base a déployer.
@@ -146,7 +155,7 @@ Troisième étape, installation des apps kubernetes, ici traefik ( l'ingress con
 .deploy apps
 [source, shell,linenums]
 ----
-$ vagrant provision --provision-with clusterkube
+$ vagrant provision --provision-with clusterapps
 ----
 
 Apres environs 1 à 2 minutes, vous pouvez acceder au interface web des kube apps :
