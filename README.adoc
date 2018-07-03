@@ -24,7 +24,7 @@ endif::[]
 
 
 
-#image::kubernetes.png[kubernetes logo]
+//image::kubernetes.png[kubernetes logo]
 
 
 [quote, Jez Humble, Continuous Delivery: Reliable Software Releases through Build; Test; and Deployment Automation]
@@ -43,16 +43,13 @@ Yakil ( Yet Another Kubernetes Environment Lab) est un projet ansible playbook l
  - [*] virtualbox: 5.2.8
  - [*] Vagrant : 2.0.3
  - [*] Ansible : 2.5.0 sera installer de manière isolé en utilisant python virtualenv afin de ne pas perturbé votre version courante d'ansible si vous l'avez deja sur votre machine.
- - [*] Vagrant Plugin: vagrant plugin install landrush vagrant plugin install vagrant-hostmanager
 
-L’élaboration de Yakel cluster respecte un certains nombre de best practices et recommandation de la communauté Kubernetes. C’est ainsi qu’il s’est très largement inspiré du tutoriel « Kubernetes The Hard Way », de Kelsey Hightower ( developer advocate chez google) et dans une moindre mesure de coreos tectonic.
+L’élaboration de Yakel cluster est très largement inspiré du tutoriel « Kubernetes The Hard Way », de Kelsey Hightower ( developer advocate chez google) et dans une moindre mesure de coreos tectonic.
 
 CAUTION: A noter,  Vous pouvez utiliser tout autre cluster kubernetes deja à votre disposition pour les prochains épisodes de cette série. Par exemple minikube permet d'avoir un kubernetes dans un seul noeud sur votre laptop, mais disons que cela contrevient un tout petit peu à l'objectif d'experimenté sur un système distribué.
 
 
 A la fin de l'installation, 5 à 8 minutes selon votre connexion internet ou la capacité de votre laptop, nous obtiendrons le cluster tel que décrit sur le schéma ci-dessous 
-
-
 
 WARNING: Attention particulière: bien que faisable, l'empreinte mémoire d'un cluster kubernetes 3 noeuds permettant d'executer spinnaker est assez importante. Je recommande quand même un bon corei7 avec 16g de ram.
 
@@ -63,7 +60,7 @@ WARNING: Attention particulière: bien que faisable, l'empreinte mémoire d'un c
 
 == Hands-On :
 
-première étape, activé l'environement virtualenv et installation d'ansible. Pour ce faire, recuperer les sources depuis github à partir du lien suivant https://github.com/kubernetes/kubernetes.git[YAKEL]
+première étape, activé l'environement virtualenv et installation d'ansible. Pour ce faire, recuperer les sources depuis github à partir du lien suivant https://github.com/jamroks/yakel.git
 
 ==== setupEnv
 
@@ -152,7 +149,7 @@ $ ./kubectl --kubeconfig kubectl.kubeconfig cluster-infos <1>
 	
 ====
   Kubernetes master is running at https://192.168.32.7:6443
-  CoreDNS is running athttps://192.168.32.7:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+  CoreDNS is running at https://192.168.32.7:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
 ====
 
 
