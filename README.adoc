@@ -185,6 +185,4 @@ INCLURE IMAGE TRAEFIK
 image::Traefikdash.png[Treafik admin ui]
 
 
-Conclusion:
-
-Le cluster kubernetes est prêt, nous pouvons maintenant deployer spinnaker notre plateforme de continuous delivery multicloud. Dans le prochain épisode nous aborderons donc l'installation et nous mettrons en place la configuration des microservices spinnaker.
+Apache 2 license
