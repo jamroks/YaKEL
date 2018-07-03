@@ -1,6 +1,6 @@
 // :stylesheet: css/asciidoctor.css
 :title-logo-image: image: images_dir [scaledwidth=70%,align=center]
-= SPINNAKER: Cloud Control Pipeline Part II
+= YaKEL: Yet Another Kubernetes Environment Lab
 René Okouya Mbongo <rene.okouya@wescale.fr>
 :imagesdir: images
 ifdef::env-github[]
@@ -41,7 +41,6 @@ L’élaboration de Yakel cluster est très largement inspiré du tutoriel « K
 
 A la fin de l'installation, 5 à 8 minutes selon votre connexion internet ou la capacité de votre laptop, nous obtiendrons le cluster tel que décrit sur le schéma ci-dessous 
 
-WARNING: Attention particulière: bien que faisable, l'empreinte mémoire d'un cluster kubernetes 3 noeuds permettant d'executer spinnaker est assez importante. Je recommande quand même un bon corei7 avec 16g de ram.
 
      INSEREZ L'IMAGE DU CLUSTER ICI 
       
