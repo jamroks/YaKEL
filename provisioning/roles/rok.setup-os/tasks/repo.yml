@@ -1,0 +1,67 @@
+---
+
+  - name: YUM REPO | Check if EPEL repo is already configured
+    stat: 
+      path: "{{ epel_repofile_path }}"
+    register: epel_repo_result
+  
+  - name: YUM REPO | Import EPEL GPG key
+    rpm_key:
+      key: "{{ epel_repo_mirror_url }}/RPM-GPG-KEY-EPEL-7"
+      state: present
+      validate_certs: no
+    when: not epel_repo_result.stat.exists
+  
+  - name: YUM REPO | Add repository EPEL Repo
+    yum_repository:
+      name: epel
+      description: EPEL YUM repo
+      baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+    when: not epel_repo_result.stat.exists
+  
+  
+  - name: YUM REPO | Disable Mirrorlist
+    replace:
+      path: '/etc/yum.repos.d/CentOS-Base.repo'
+      regexp: '^(mirrorlist.*)'
+      replace: '#\1'
+  
+  - name: YUM REPO | Enable BaseUrl
+    replace:
+      path: '/etc/yum.repos.d/CentOS-Base.repo'
+      regexp: '^#(baseurl.*)'
+      replace: '\1'
+  
+  - name: YUM REPO | Enable CentOS plus Repository
+    ini_file:
+      path: '/etc/yum.repos.d/CentOS-Base.repo'
+      section: centosplus
+      option: enabled
+      value: 1
+      backup: yes
+  
+
+  - name: YUM REPO | ensure common packages are installed
+    become: yes
+    yum:
+      name: "{{ item }}"
+      state: present
+      validate_certs: no
+    with_items:
+        - socat
+        - nfs-utils
+        - jq
+        - htop
+        - vim
+        - net-tools
+        - wget
+        - perl
+        - bzip2
+        - libselinux-python
+        - conntrack-tools
+        - bind-utils
+        - lsof
+        - nc
+    notify: Restart network
+  
+  - meta: flush_handlers

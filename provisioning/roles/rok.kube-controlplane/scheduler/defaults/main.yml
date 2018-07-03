@@ -1,0 +1,13 @@
+---
+
+kube_master_secure_port: "{{ secure_port | default('6443') }}"
+
+kube_master_insecure_port: "{{ insecure_port | default('8080')}}"
+
+scheduler_opts:
+  "kubeconfig": "/etc/kubernetes/scheduler.kubeconfig"
+  "leader-elect": "true"
+  "profiling": "false"
+  "feature-gates": "SupportIPVSProxyMode=true"
+  "v": "2"
+    

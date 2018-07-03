@@ -1,0 +1,26 @@
+---
+
+- hosts: cluster
+  name: configure and install os pre-requisite
+  any_errors_fatal: true
+  become: yes
+  tags: ['bootstrap']
+  pre_tasks:
+    # We require Ansible 2.5.3 or newer
+    - name: Check Ansible version
+      assert:
+        that: '(ansible_version.major, ansible_version.minor, ansible_version.revision) >= (2, 5, 0)'
+        msg: 'Please install the recommended version ≥ 2.5.4. You have Ansible {{ ansible_version.string }}.'
+      run_once: yes
+      delegate_to: localhost
+
+    - name: Playbook runs correctly only on Linux or Mac OSX
+      assert:
+        that: 'ansible_system == "Linux" or ansible_os_family == "Darwin"'
+        msg: 'The playbook can only be run on Linux or Mac OSX systems'
+      run_once: yes
+      delegate_to: localhost
+  tasks:
+  - name: start <role> | call setup-os
+    import_role:
+        name: rok.setup-os

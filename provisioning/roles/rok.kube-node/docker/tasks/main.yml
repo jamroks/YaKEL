@@ -1,0 +1,15 @@
+---
+
+- name: configure repo
+  import_tasks: repo.yml
+
+- name: install docker package
+  import_tasks: install.yml
+
+
+- name: configure
+  import_tasks: config.yml
+
+
+- name: docker service systemd 
+  import_tasks: service.yml

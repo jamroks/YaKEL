@@ -1,0 +1,50 @@
+---
+
+- name: Ensure Old Docker packaged is not present
+  yum:
+    name: '{{ item }}'
+    state: absent
+  with_items:
+    - docker
+    - docker-common
+    - docker-engine
+
+
+# package docker-ce-selinux is marked obselete on official docker repo
+# this is a workaround because docker-ce depend on docker-ce-selinux
+- name: Deactivate Obselete in yum.conf for installing docker-ce-17.03.2
+  lineinfile:
+    path: /etc/yum.conf
+    regexp: '^obsoletes=.*'
+    line: 'obsoletes=0'
+
+- name: Install needed yum package
+  yum:
+    name: "{{ item }}"
+  with_items:
+      - libcgroup
+      - libseccomp
+      - libtool-ltdl
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
+      - yum-plugin-versionlock
+
+
+- name: Lock docker to specific version
+  shell: 'yum versionlock add "{{ docker_pkg_name }}-{{ docker_pkg_version }}.*"'
+  args: 
+    warn: false
+
+- name: Install Docker
+  yum:
+    name: "{{ docker_pkg_name }}-{{ docker_pkg_version }}.{{ centos_ext_version }}"
+    state: "{{ docker_pkg_state }}"
+    disable_gpg_check: no
+
+- name: Reactivate obselate in yum.conf for installing docker
+  lineinfile:
+    path: /etc/yum.conf
+    regexp: '^obsoletes=.*'
+    line: 'obsoletes=1'
+

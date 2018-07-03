@@ -1,0 +1,22 @@
+{
+  "CN": "{{ kubeletUserPrefix }}:{{ item.nodename }}",
+  "hosts": [
+    "{{ item.ip }}",
+    "{{ item.fqdn }}",
+    "{{ item.nodename }}"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "{{ kubecert.country }}",
+      "L": "{{ kubecert.locality }}",
+      "O": "{{ kubeletGroup }}",
+      "OU": "{{ kubecert.organizationalunit }}",
+      "ST": "{{ kubecert.stateorprovince }}"
+    }
+  ]
+
+}

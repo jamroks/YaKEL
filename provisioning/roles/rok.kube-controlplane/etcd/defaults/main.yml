@@ -1,0 +1,6 @@
+
+---
+  
+# etcd_version: "v3.2.4"
+# etcd_release: "etcd-{{ etcd_version }}-linux-amd64"
+# etcd_mirror_url: "https://storage.googleapis.com/etcd/{{ etcd_version }}/{{ etcd_release }}.tar.gz"

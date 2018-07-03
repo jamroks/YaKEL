@@ -1,0 +1,35 @@
+---
+
+  - name: install nfs-utils yum pkg
+    yum:
+      name: nfs-utils
+      state: present
+    register: nfs_yum_utils_yum
+    until: nfs_yum_utils_yum is succeeded
+    retries: 3
+    delay: 3
+
+  - name: copy apiserver systemd service file
+    template:
+         src: kube-apiserver.service.j2
+         dest: '/etc/systemd/system/kube-apiserver.service'
+         owner: root
+         group: root
+         mode: 0664
+    register: systemd_event
+    
+  
+  - name: call handlers in case of changed event
+    command: /bin/true
+    notify: ApiServerHandlers | Restart kube-apiserver
+    when: systemd_event is changed
+
+
+  - meta: flush_handlers
+
+  - name: ensure apiserver is running
+    systemd:
+         name: kube-apiserver.service
+         state: started
+
+

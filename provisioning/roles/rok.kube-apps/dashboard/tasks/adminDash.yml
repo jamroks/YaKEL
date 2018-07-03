@@ -1,0 +1,86 @@
+---
+# secret = kubectl -n kube-system get sa kubernetes-dashboard-admin -o jsonpath={.secrets[0].name}
+
+# token = kubectl -n kube-system get secrets string(secret) -o  jsonpath={.data.token}
+
+# kubectl -n kube-system  get sa kubernetes-dashboard-admin -o json | jq -r '.secrets[0].name'
+# kubectl -n kube-system get secrets kubernetes-dashboard-admin-token-ksbrp -o json | jq -r '.data.token'
+# kubectl -n kube-system get secrets kubernetes-dashboard-admin-token-ksbrp -o json
+
+- name: set fact for service account
+  set_fact:
+     service_account: kubernetes-dashboard-admin
+
+- name: install jq
+  yum:
+    name: jq
+    state: present
+
+
+- name: " get Secret name for {{ service_account }}"
+  command: kubectl -n kube-system get sa {{ service_account }} -o jsonpath='{.secrets[0].name}'
+  register: secretName
+
+
+- name: "get Token for  {{ service_account }}"
+  shell: kubectl -n kube-system get secrets "{{ secretName.stdout }}" -o json | jq -r '.data.token' | base64 --decode
+  register: token
+
+
+- name: print value of token var
+  debug:
+     msg: token.stdout
+     verbosity: 2
+  
+
+- name: store ouput content
+  copy:
+    content: "{{ token.stdout }}"
+    dest: "/etc/kubernetes/certs/admin_token"
+
+
+- name: fecth admin_token file
+  fetch:
+    src: "/etc/kubernetes/certs/admin_token"
+    dest: "{{ playbook_dir }}/../pki/admin_token"
+    flat: yes
+   
+- name: slurp & gather token and cacert for dashboard admin user
+  become: no
+  local_action:
+     module: slurp
+     src: "{{ item }}"
+  register: dashCreds
+  with_items:
+       - "{{ playbook_dir }}/../pki/certs/ca.pem"
+       - "{{ playbook_dir }}/../pki/admin_token"
+
+- name: write admin dashboard kubeconfig
+  become: no
+  local_action:
+     module: template
+     src: dashboard.kubeconfig.j2
+     dest: "{{ playbook_dir }}/../dashboard.kubeconfig"
+
+
+
+# - name: download kubectl binary to current node
+#   tags: ['kubectl']
+#   become: no
+#   local_action:
+#        module: get_url
+#        url: '{{ kube_mirror_url }}/{{ kube_version }}/bin/{{ ansible_system | lower}}/amd64/kubectl'
+#        dest: "{{ playbook_dir }}/../kubectl"
+#        mode: 0755
+#        validate_certs: false
+#   delegate_facts: False
+
+# - name: download kubectl binary to current node
+#   tags: ['kubectl']
+#   become: no
+#   get_url:
+#        url: '{{ kube_mirror_url }}/{{ kube_version }}/bin/{{ ansible_system | lower}}/amd64/kubectl'
+#        dest: "{{ playbook_dir }}/../kubectl"
+#        mode: 0755
+#        validate_certs: false
+#   delegate_to: localhost

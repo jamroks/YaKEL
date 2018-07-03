@@ -1,0 +1,27 @@
+---
+
+  - name: KubeletHandlers | Restart kubelet
+    command: /bin/true
+    notify:
+      - KubeletHandlers | reload and restart kubelet service
+      - KubeletHandlers | ensure kubelet is running
+      - KubeletHandlers | verify kubelet is running
+
+  - name: KubeletHandlers | reload and restart kubelet service
+    systemd:
+      name: kubelet
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+
+  - name: KubeletHandlers | ensure kubelet is running
+    systemd:
+        name: kubelet.service
+        state: started
+
+  - name: KubeletHandlers | verify kubelet is running
+    command: systemctl status kubelet
+    register: running_result
+    until: running_result is success
+    retries: 3
+    delay: 5

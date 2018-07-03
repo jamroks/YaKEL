@@ -1,0 +1,30 @@
+{
+  "CN": "{{ item.nodename }}",
+  "hosts": [
+    "{{ item.fqdn }}",
+    "{{ item.nodename }}",
+    "{{ item.ip }}",
+    "{{ cluster.networking.service_cidr_address|ipaddr('net')|ipaddr(1)|ipaddr('address') }}",
+    "127.0.0.1",
+    "kubernetes",
+    "kubernetes.default",
+    "kubernetes.default.svc",
+    "kubernetes.default.svc.cluster",
+    "kubernetes.default.svc.cluster.local"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "{{ kubecert.country }}",
+      "L": "{{ kubecert.locality }}",
+      "O": "{{ kubecert.organisation }}",
+      "OU": "{{ kubecert.organizationalunit }}",
+      "ST": "{{ kubecert.stateorprovince }}"
+    
+    }
+    
+  ]
+}

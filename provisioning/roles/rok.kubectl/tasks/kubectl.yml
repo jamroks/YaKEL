@@ -1,0 +1,37 @@
+---
+  - name: get fact for "{{ ansible_system }}" on "{{ inventory_hostname }}"
+    tags: ['kubectl']
+    become: no
+    setup:
+      filter: 'ansible_system'
+    register: operating_system
+  
+  
+  - name: download kubectl binary to ansible localhost
+    tags: ['kubectl']
+    become: no
+    get_url:
+       dest: "{{ playbook_dir }}/../kubectl"
+       url: 'https://storage.googleapis.com/kubernetes-release/release/{{ kube_version }}/bin/{{ ansible_system | lower}}/amd64/kubectl'
+       mode: 0755
+       validate_certs: false
+
+
+  - name: gather certs for kubectl user admin
+    become: no
+    tags: ['kubectl']
+    local_action:
+       module: slurp
+       src: "{{ item }}"
+    register: adminCreds
+    with_items:
+       - "{{ tls_source_dir }}/certs/ca.pem"
+       - "{{ tls_source_dir }}/certs/admin.pem"
+       - "{{ tls_source_dir }}/certs/admin-key.pem"
+
+  - name: write admin kubectl kubeconfig
+    tags: ['kubectl']
+    become: no
+    template:
+       src: kubectl.kubeconfig.j2
+       dest: "{{ playbook_dir }}/../kubectl.kubeconfig"

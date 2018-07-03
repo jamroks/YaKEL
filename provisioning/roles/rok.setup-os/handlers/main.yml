@@ -1,0 +1,59 @@
+---
+
+- name: Restart network
+  systemd:
+     name: "{{ item }}"
+     state: restarted
+  with_items:
+      - network
+      - NetworkManager
+
+- name: RebootHandlers | restart server
+  command: /bin/true
+  notify:
+    - RebootHandlers | Message Starting Reboot Phase
+    - RebootHandlers | Reboot system smoothly
+    - RebootHandlers | Wait for system to come up
+    - RebootHandlers | Message System Is Back Online
+
+
+- name: RebootHandlers | Message Starting Reboot Phase
+  debug:
+        msg: "Will reboot and then wait for {{ ansible_host }}:{{ ansible_port }} to be Up again"
+  
+- name: RebootHandlers | Reboot system smoothly
+  shell: shutdown -r  now  "Ansible triggered reboot"
+  async: 1
+  poll: 0
+  # ignore_errors: true
+
+# - name: RebootHandlers | Reboot system
+#   shell: sleep 2 && shutdown -r now "Ansible triggered reboot"
+#   async: 1
+#   poll: 0
+#   ignore_errors: true
+
+# - name: RebootHandlers | Wait for system to come up
+#   wait_for_connection:
+#     timeout: 120
+
+- name: RebootHandlers | Wait for system to come up
+  local_action: 
+      module: wait_for 
+      host: "{{ ansible_host }}"
+      port: "{{ ansible_port }}"
+      state: started 
+      delay: 15 
+      timeout: 300
+  become: False
+
+- name: RebootHandlers | Message System Is Back Online
+  debug:
+      msg: " Server on {{ ansible_host }}:{{ ansible_port }} IS Back Up again"
+
+
+- name: NTPHandlers | Restart NTP
+  systemd:
+     name: "{{ ntp_daemon }}"
+     state: restarted
+  when: ntp_enabled

@@ -1,0 +1,8 @@
+---
+
+  - name: deploy calico daemonset on cluster kube
+    import_tasks: deploy.yml
+  
+  # - name: check health calico pods on cluster kube
+  #   import_tasks: verify.yml
+  #   when: "'controlplane' in group_names"

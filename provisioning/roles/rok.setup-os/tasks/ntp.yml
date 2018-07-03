@@ -1,0 +1,31 @@
+---
+
+
+  - name: Ensure NTP-related packages are installed.
+    yum:
+      name: ntp
+      state: present
+
+  - name: Ensure tzdata package is installed
+    yum:
+      name: tzdata
+      state: present
+
+  - name: Set timezone
+    timezone:
+      name: "{{ ntp_timezone }}"
+
+
+  - name: Ensure NTP is running and enabled as configured.
+    systemd:
+      name: "{{ ntp_daemon }}"
+      state: started
+      enabled: yes
+    when: ntp_enabled
+
+  - name: Generate ntp.conf file
+    template:
+      src: ntp.conf.j2
+      dest: /etc/ntp.conf
+    notify: NTPHandlers | Restart NTP
+    when: ntp_manage_config

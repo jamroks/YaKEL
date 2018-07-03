@@ -1,0 +1,24 @@
+---
+
+- name: SchedulerHandlers | Restart kube-scheduler
+  command: /bin/true
+  notify:
+    - SchedulerHandlers | reload and restart scheduler service
+    - SchedulerHandlers | wait for kube-scheduler
+
+
+- name: SchedulerHandlers | reload and restart scheduler service
+  systemd:
+      name: kube-scheduler.service
+      state: restarted
+      enabled: yes
+      daemon_reload: True
+
+- name: SchedulerHandlers | wait for kube-scheduler
+  uri:
+    url: http://localhost:10251/healthz
+    status_code: 200
+  register: scheduler_result
+  until: "scheduler_result.status == 200"
+  retries: 60
+  delay: 5

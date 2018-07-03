@@ -1,0 +1,39 @@
+---
+
+  # - name: create directory
+  #   file:
+  #     path: /etc
+  #     state: directory
+
+  - name: copy scheduler kubeconfig
+    template:
+      src: scheduler-kubeconfig.j2
+      dest: "/etc/kubernetes/scheduler.kubeconfig"
+      owner: root
+      group: root
+      mode: 0664
+    register: kubeconfig_event
+
+
+  - name: copy scheduler systemd service file
+    template:
+         src: kube-scheduler.service.j2
+         dest: '/etc/systemd/system/kube-scheduler.service'
+         owner: root
+         group: root
+         mode: 0664
+    register: systemd_event
+
+
+  - name: call handlers in case of changed event
+    command: /bin/true
+    notify: SchedulerHandlers | Restart kube-scheduler
+    when: "(kubeconfig_event is changed) or (systemd_event is changed)"
+
+
+  - meta: flush_handlers
+
+  - name: ensure scheduler is running
+    systemd:
+         name: kube-scheduler.service
+         state: started

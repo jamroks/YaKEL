@@ -1,0 +1,48 @@
+---
+
+- name: set fact for service account
+  set_fact:
+     service_account: kube-proxy
+  when:
+
+- name: install jq
+  yum:
+    name: jq
+    state: present
+
+
+- name: " get Secret name for {{ service_account }}"
+  command: kubectl -n kube-system get sa {{ service_account }} -o jsonpath='{.secrets[0].name}'
+  register: secretName
+
+- name: "get Token for  {{ service_account }}"
+  register: jwt_token
+  shell: >
+         kubectl -n kube-system get secrets "{{ secretName.stdout }}" 
+         -o json | jq -r '.data.token' | base64 --decode
+  
+
+- name: print value of token var
+  debug:
+     var: jwt_token.stdout
+     verbosity: 2
+
+- name: store ouput content
+  copy:
+    content: "{{ jwt_token.stdout }}"
+    dest: "{{ kube_etc_dir }}/kubeproxy_token"
+
+
+- name: gather token kubeproxy service account and ca cert
+  slurp:
+     src: "{{ item }}"
+  register: Credentials
+  with_items:
+       - "{{ kube_etc_dir }}/certs/ca.pem"
+       - "{{ kube_etc_dir }}/kubeproxy_token"
+
+
+- name: generate kube-proxy kubeconfig 
+  template:
+     src: kube-proxy.kubeconfig.j2
+     dest: "{{ kube_config.kubeproxy }}"

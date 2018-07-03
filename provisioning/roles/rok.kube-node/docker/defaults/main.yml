@@ -1,0 +1,94 @@
+---
+
+# yum list docker-ce --showduplicates | sort -r
+docker_repo_enabled: true
+
+docker_repo_branch: "main"
+
+docker_edition: "ce"
+
+docker_pkg_name: "docker-{{ docker_edition }}"
+
+docker_default_version: 17.03.2
+
+docker_yum_repo_url: "https://download.docker.com/linux/centos/docker-{{ docker_edition }}.repo"
+docker_repo_channel_stable_enabled: true
+docker_yum_repo_enable_edge: 0
+docker_yum_repo_enable_test: 0
+
+docker_pkg_version:   "{{ docker_version|default(docker_default_version) }}"
+
+centos_ext_version: "{{ docker_edition }}-1.el7.centos"
+
+docker_pkg_state: "present"
+
+docker_service_name: "docker"
+
+docker_service_enable: true
+
+docker_group: "docker"
+
+
+docker_users:
+    - "{{ ansible_user }}"
+
+
+docker_install_py_module: true
+docker_py_pkg_name: "docker-py"
+docker_py_pkg_state: "latest"
+
+# Proxy related stuff in case you need it
+docker_proxy_enabled: false
+
+## list of env variables we should set (comment out the ones you don't need)
+docker_proxy_env:
+  - "HTTP_PROXY=http://proxy.blabla.com:80/"
+  - "HTTPS_PROXY=https://proxy.blabla.com:443/"
+  - "NO_PROXY=localhost,127.0.0.1,.roklab.ops"
+
+
+docker_client_config_enabled: false
+## the location we should push client configuration
+docker_client_config_location: "/root/.docker/config.json"
+docker_login_config:
+  root:
+    - registry_url: hub.myregistry.com
+      username: docker-ro
+      password: xxxxxxx
+    - registry_url: hub.myregistry.com
+      username: docker-ro
+      password: xxxxxxx
+  rok:
+    - registry_url: hub.myregistry.com
+      username: docker-rw
+      password: xxxxxxx
+
+
+docker_config_hosts:
+  - "unix:///var/run/docker.sock"
+  - "tcp://0.0.0.0:2375"
+docker_config_data_root: "/var/lib/docker"
+docker_config_storage_driver: "overlay2"
+docker_config_storage_driver_opts: [ "overlay2.override_kernel_check=true" ]
+docker_config_log_driver: "journald"
+#docker_config_log_opts: {}
+docker_config_max_concurrent_downloads: 6
+docker_config_max_concurrent_uploads: 5
+docker_config_debug: false
+docker_config_group: "{{ docker_group }}"
+docker_config_insecure_registries: []
+
+
+docker_config_common:
+  "log-driver": "{{ docker_config_log_driver }}"
+  "data-root": "{{ docker_config_data_root }}"
+  "storage-driver": "{{ docker_config_storage_driver }}"
+  "storage-opts": "{{ docker_config_storage_driver_opts }}"
+  "max-concurrent-downloads": "{{ docker_config_max_concurrent_downloads }}"
+  "max-concurrent-uploads": "{{ docker_config_max_concurrent_uploads }}"
+  "debug": "{{ docker_config_debug }}"
+  "hosts": "{{ docker_config_hosts }}"
+  "group": "{{ docker_config_group }}"
+ 
+
+docker_config_custom: {}

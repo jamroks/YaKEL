@@ -1,0 +1,20 @@
+---
+
+kube_master_secure_port: "{{ secure_port | default('6443') }}"
+
+kube_master_insecure_port: "{{ insecure_port | default('8080')}}"
+
+controller_opts:
+  "address": "0.0.0.0"
+  "allocate-node-cidrs": "true"
+  "cluster-cidr": "{{ cluster.networking.pod_cidr_address }}"
+  "cluster-name": "{{ cluster.name }}"
+  "kubeconfig": "/etc/kubernetes/controller-manager.kubeconfig"
+  "leader-elect": "true"
+  "profiling": "false"
+  "root-ca-file": "/etc/kubernetes/certs/ca.pem"
+  "service-account-private-key-file": "/etc/kubernetes/certs/apiserver-key.pem"
+  "service-cluster-ip-range": "{{ cluster.networking.service_cidr_address }}"
+  "feature-gates": "SupportIPVSProxyMode=true"
+  "use-service-account-credentials": "true"
+  "v": "2"

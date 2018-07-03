@@ -1,0 +1,17 @@
+{
+    "signing": {
+      "default": {
+        "expiry": "{{ kubecert.expiry }}"
+      },
+      "profiles": {
+        "kubernetes": {
+          "usages": ["signing", "key encipherment", "server auth", "client auth"],
+          "expiry": "{{ kubecert.expiry }}"
+        },
+        "peer": {
+          "usages": ["signing", "key encipherment", "server auth", "client auth"],
+          "expiry": "{{ kubecert.expiry }}"
+        }
+      }
+    }
+}

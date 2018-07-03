@@ -1,0 +1,31 @@
+---
+
+  - name: NetworkManager | Install NM Glib API
+    yum:
+      name: "{{ item }}"
+      state: present
+    with_items: 
+      - libsemanage-python
+      - NetworkManager-glib
+      - policycoreutils-python
+      # - nm-connection-editor.x86_64
+
+  - name: NetworkManager | Setting DNS nameserver config
+    nmcli:
+      type: ethernet
+      conn_name: "System {{ prefered_device }}"
+      dns4: ["10.0.2.3"]
+      state: present
+    notify: Restart network
+  
+  - name: NetworkManager | Setting DNS resolver - search domain for prefered_device interface
+    command: > 
+             nmcli con mod
+             "System {{ prefered_device }}" ipv4.dns-search "{{ vagrant.domain_tld }}"
+    notify: Restart network
+  
+
+  - name: NetworkManager | Change the generale hostname of the host
+    command: nmcli general hostname "{{ inventory_hostname }}"
+      
+  - meta: flush_handlers

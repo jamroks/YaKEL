@@ -1,0 +1,14 @@
+---
+
+service_account: 'calico-node'
+
+calico_dir: '/etc/calico'
+
+cni:
+  enabled: true
+  provider: calico
+  options:
+      mode: overlay
+      log_level: info
+      workload_mtu: 1500
+      felix_input_mtu: 1440

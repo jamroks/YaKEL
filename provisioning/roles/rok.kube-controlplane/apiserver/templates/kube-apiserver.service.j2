@@ -1,0 +1,20 @@
+[Unit]
+Description=Kubernetes API Server
+Documentation=https://github.com/kubernetes/kubernetes
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/kube-apiserver \
+{% set combined_options = apiserver_opts -%}
+{% for option in combined_options | dictsort %}
+{% if option[1] is defined and option[1] | string | length > 0 %}
+  --{{ option[0] }}={{ option[1] }} {% if not loop.last %}\
+{% endif %}
+{% endif %}
+{% endfor %}
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

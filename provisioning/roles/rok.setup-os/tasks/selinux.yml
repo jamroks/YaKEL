@@ -1,0 +1,12 @@
+---
+
+# will take effect in next reboot, not sure
+- name: Disable SELinux
+  selinux:
+    state: disabled
+
+# for now disable selinux immediatly
+- name: Set SELinux in permissive mode until the machine is rebooted
+  command: setenforce 0
+  ignore_errors: true
+  changed_when: false

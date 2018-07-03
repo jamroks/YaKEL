@@ -1,0 +1,125 @@
+---
+
+- name: Certs | Generate CAs. Certs
+  shell: cfssl gencert -initca json/ca-csr.json | cfssljson -bare certs/ca
+  args:
+    chdir: "{{ tls_source_dir }}"
+    creates: "{{ tls_source_dir }}/certs/ca-key.pem"
+
+
+- name: Certs | Generate etcd Tls certificate
+  shell: > 
+           cfssl gencert -ca certs/ca.pem -ca-key certs/ca-key.pem
+           -config json/ca-config.json -profile=kubernetes "json/{{ item.nodename }}-etcd.json"
+           | cfssljson -bare "certs/{{ item.nodename }}-etcd"
+  args:
+    chdir: "{{ tls_source_dir }}"
+    creates: "{{ tls_source_dir }}/certs/{{ item.nodename }}-etcd-key.pem"
+  with_items: "{{ server.etcd.nodes }}"
+
+
+- name: Certs | apiserver Tls certificate
+  shell: > 
+           cfssl gencert -ca certs/ca.pem -ca-key certs/ca-key.pem
+           -config json/ca-config.json -profile=kubernetes "json/{{ item.nodename }}-apiserver.json"
+           | cfssljson -bare "certs/{{ item.nodename }}-apiserver"
+  args:
+    chdir: "{{ tls_source_dir }}"
+    creates: "{{ tls_source_dir }}/certs/{{ item.nodename }}-apiserver-key.pem"
+  with_items: "{{ server.controlplane.nodes }}"
+
+- name: Certs | Tls for kubelet client on master
+  shell: >
+           cfssl gencert -ca certs/ca.pem -ca-key certs/ca-key.pem
+           -config json/ca-config.json -profile=kubernetes "json/apiserver-kubelet-client.json"
+           | cfssljson -bare "certs/apiserver-kubelet-client"
+  args:
+    chdir: "{{ tls_source_dir }}"
+    creates: "{{ tls_source_dir }}/certs/apiserver-kubelet-client-key.pem"
+  with_items: "{{ server.controlplane.nodes }}"
+
+- name: Certs | Tls for kubelet
+  shell: >
+           cfssl gencert -ca certs/ca.pem -ca-key certs/ca-key.pem
+           -config json/ca-config.json -profile=kubernetes "json/{{ item.nodename }}-kubelet.json"
+           | cfssljson -bare "certs/{{ item.nodename }}-kubelet"
+  args:
+    chdir: "{{ tls_source_dir }}"
+    creates: "{{ tls_source_dir }}/certs/{{ item.nodename }}-kubelet-key.pem"
+  with_items: "{{ server.controlplane.nodes + server.worker.nodes }}"
+
+
+- name: Certs | Tls for kube-proxy
+  shell: > 
+           cfssl gencert -ca certs/ca.pem -ca-key certs/ca-key.pem
+           -config json/ca-config.json -profile=kubernetes "json/kube-proxy.json"
+           | cfssljson -bare "certs/kube-proxy"
+  args:
+    chdir: "{{ tls_source_dir }}"
+    creates: "{{ tls_source_dir }}/certs/kube-proxy-key.pem"
+  #with_items: "{{ server.controlplane.nodes + server.worker.nodes }}"
+
+
+- name: Certs | controller-manager and scheduler Tls certificate
+  shell: > 
+           cfssl gencert -ca certs/ca.pem -ca-key certs/ca-key.pem
+           -config json/ca-config.json -profile=kubernetes "json/{{ item }}.json"
+           | cfssljson -bare "certs/{{ item }}"
+  args:
+    chdir: "{{ tls_source_dir }}"
+    creates: "{{ tls_source_dir }}/certs/{{ item }}-key.pem"
+  with_items:
+      - kube-controller-manager
+      - kube-scheduler
+
+
+- name: Certs | etcdclients Tls certificate
+  shell: > 
+           cfssl gencert -ca certs/ca.pem -ca-key certs/ca-key.pem
+           -config json/ca-config.json -profile=kubernetes "json/{{ item }}.json"
+           | cfssljson -bare "certs/{{ item }}"
+  args:
+    chdir: "{{ tls_source_dir }}"
+    creates: "{{ tls_source_dir }}/certs/{{ item }}-key.pem"
+  with_items:
+    - etcd-client
+
+
+- name: Certs | admin Tls certificate
+  shell: > 
+           cfssl gencert -ca certs/ca.pem -ca-key certs/ca-key.pem
+           -config json/ca-config.json -profile=kubernetes "json/{{ item }}.json"
+           | cfssljson -bare "certs/{{ item }}"
+  args:
+    chdir: "{{ tls_source_dir }}"
+    creates: "{{ tls_source_dir }}/certs/{{ item }}-key.pem"
+  with_items:
+      - admin
+
+
+# - name: Certs | service-account Tls certificate
+#   shell: > 
+#            cfssl gencert -ca certs/ca.pem -ca-key certs/ca-key.pem
+#            -config json/ca-config.json -profile=kubernetes "json/{{ item }}.json"
+#            | cfssljson -bare "certs/{{ item }}"
+#   args:
+#     chdir: "{{ tls_source_dir }}"
+#     creates: "{{ tls_source_dir }}/certs/{{ item }}-key.pem"
+#   with_items:
+#       - service-account
+
+
+
+
+# - name: Create local SSL directory for fetch.
+#   delegate_to: 127.0.0.1
+#   file:
+#     path: ./ssl
+#     state: directory
+#   become: false
+
+# - name: Sync SSL certificates.
+#   synchronize:
+#     src: "{{ volume_path }}/cfssl/certs/"
+#     dest: "./ssl/{{ env }}"
+#     mode: pull

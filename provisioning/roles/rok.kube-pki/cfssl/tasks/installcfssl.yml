@@ -1,0 +1,40 @@
+---
+- name: Download statically linked cfssl binary
+  get_url:
+    url: https://pkg.cfssl.org/{{cfssl_version}}/cfssl_{{ ansible_system | lower }}-amd64
+    dest: "{{ cfssl_bin_directory }}/cfssl"
+    mode: 0755
+    #checksum: "sha256:{{ ansible_system | lower }}"
+  when: "( ansible_system | lower) == 'darwin'"
+  tags:
+    - cfssl
+
+- name: Download statically linked cfssl binary
+  get_url:
+    url: https://pkg.cfssl.org/{{cfssl_version}}/cfssl_{{ ansible_system | lower }}-amd64
+    dest: "{{cfssl_bin_directory}}/cfssl"
+    mode: 0755
+    #checksum: sha256:eb34ab2179e0b67c29fd55f52422a94fe751527b06a403a79325fed7cf0145bd
+  when:  "( ansible_system | lower) == 'linux'"
+  tags:
+    - cfssl
+
+
+- name: Download statically linked cfssljson binary
+  get_url:
+    url: https://pkg.cfssl.org/{{cfssl_version}}/cfssljson_darwin-amd64
+    dest: "{{cfssl_bin_directory}}/cfssljson"
+    mode: 0755
+  when:  "(ansible_os_family | lower)  == 'darwin'"
+  tags:
+    - cfssl
+
+
+- name: Download statically linked cfssljson binary
+  get_url:
+    url: https://pkg.cfssl.org/{{cfssl_version}}/cfssljson_linux-amd64
+    dest: "{{cfssl_bin_directory}}/cfssljson"
+    mode: 0755
+  when:  "(ansible_system | lower) == 'linux'"
+  tags:
+    - cfssl

@@ -1,0 +1,63 @@
+---
+
+epel_repo_url: "https://download.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+             
+epel_repo_mirror_url: "https://download.fedoraproject.org/pub/epel"
+epel_repofile_path: "/etc/yum.repos.d/epel.repo"
+
+ipvs_kernel_modules:
+  - ip_vs
+  - ip_vs_rr
+  - ip_vs_wrr
+  - ip_vs_sh
+  - nf_conntrack_ipv4
+
+sysctl_config:
+  vm.swappiness: 0
+  net.ipv4.ip_forward: 1
+  net.ipv4.conf.default.forwarding: 1
+  net.bridge.bridge-nf-call-iptables: 1
+  net.ipv6.conf.all.disable_ipv6: 1
+  net.ipv6.conf.default.disable_ipv6: 1
+
+ntp_enabled: true
+ntp_timezone: "{{ vagrant.timezone | default('Europe/Paris')}}"
+ntp_area: "{{ vagrant.ntp_area | default('fr')}}"
+
+ntp_servers:
+  - "0.{{ ntp_area }}.pool.ntp.org iburst"
+  - "1.{{ ntp_area }}.pool.ntp.org iburst"
+  - "2.{{ ntp_area }}.pool.ntp.org iburst"
+  - "3.{{ ntp_area }}.pool.ntp.org iburst"
+
+ntp_manage_config: true
+ntp_daemon: ntpd
+ntp_restrict:
+  - "127.0.0.1"
+  - "::1"
+
+vbox_guest_additions: "{{ vagrant.vbox_guest_version | default('5.2.8') }}"
+
+vbox:
+  mirror: http://download.virtualbox.org/virtualbox
+  name: VBoxGuestAdditions
+  file: "VBoxGuestAdditions_{{ vbox_guest_additions }}.iso"
+  iso_mount_path: /mnt/virtualbox
+  version: "{{ vbox_guest_additions }}"
+  iso_path: "/tmp/VBoxGuestAdditions_{{ vbox_guest_additions }}.iso"
+
+
+virtualbox_os_packages:
+  - virtualbox-guest-additions-iso
+  - virtualbox-guest-dkms
+  - virtualbox-guest-source
+  - virtualbox-guest-utils
+  - virtualbox-guest-x11
+
+# shell: "vboxmanage --version | awk -F'[r_]' '{print $1}'"
+
+#VBoxGuestAdditions_5.2.8.iso
+# http://download.virtualbox.org/virtualbox/5.2.8/
+# VBoxGuestAdditions_5.2.8.iso
+# http://download.virtualbox.org/virtualbox/rpm/rhel/7/x86_64/
+#VirtualBox-5.2-5.2.8_121009_el7-1.x86_64.rpm  

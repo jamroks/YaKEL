@@ -1,0 +1,60 @@
+---
+
+- name: Disable system swap
+  shell: "swapoff -a"
+
+- name: Remove current swaps from fstab
+  lineinfile:
+    dest: /etc/fstab
+    regexp: '(?i)^([^#][\S]+\s+(none|swap)\s+swap.*)'
+    line: '# \1'
+    backrefs: yes
+    state: present
+
+- name: Change various sysctl-settings
+  sysctl:
+    name: '{{ item.key }}'
+    value: '{{ item.value }}'
+    sysctl_set: yes
+    state: present
+    reload: yes
+    ignoreerrors: yes
+  with_dict: '{{ sysctl_config }}'
+
+- name: Configure SSH daemon.
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  with_items:
+      - { regexp: '^(.*)AddressFamily', line: 'AddressFamily inet' }
+
+- name: restart network services
+  systemd:
+     name: "{{ item }}"
+     state: restarted
+  with_items:
+      - network
+
+
+- name: /bin/sh is /bin/bash
+  file:
+    src: /bin/bash
+    dest: /bin/sh
+    state: link
+
+- name: common alias
+  copy:
+    dest: /etc/profile.d/ll.sh
+    content: "alias ll=\"ls --color -lA\"\n"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Fix slow DNS.
+  lineinfile:
+    dest: /etc/sysconfig/network
+    regexp: '^RES_OPTIONS'
+    line: 'RES_OPTIONS="single-request-reopen"'
+    state: present

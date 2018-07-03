@@ -1,0 +1,46 @@
+---
+
+  - name: CoreDnsHandlers | Verify
+    command: /bin/true
+    notify:
+      - CoreDnsHandlers | Get expected number of coreDNS replica 
+      - CoreDnsHandlers | Wait for coreDNS pods to be avalaible
+  
+
+  - name: CoreDnsHandlers | Get expected number of coreDNS replica 
+    command: kubectl get deployment coredns  -o=jsonpath='{.status.availableReplicas}' -n kube-system 
+    register: expectedReplicas
+    until: expectedReplicas is succeeded and expectedReplicas.stdout|int > 0
+    retries: 30
+    delay: 10
+    #failed_when: false
+
+  - name: CoreDnsHandlers | Wait for coreDNS pods to be avalaible
+    command: kubectl get deployment coredns -o=jsonpath='{.status.readyReplicas}' --namespace=kube-system #--kubeconfig /root/.kube/config
+    register: readyPods
+    until: expectedReplicas.stdout|int == readyPods.stdout|int
+    retries: 20
+    delay: 6
+    #failed_when: false
+    #changed_when: false
+    run_once: true
+
+
+  #   - name: CalicoHandlers | Get expected number of calico pods
+  #   command: kubectl get ds calico-node -o=jsonpath='{.status.desiredNumberScheduled}' -n kube-system 
+  #   register: expectedPods
+  #   until: expectedPods is succeeded and expectedPods.stdout|int > 0
+  #   retries: 20
+  #   delay: 6
+  #   run_once: true
+  #   changed_when: false
+  
+  # - name: CalicoHandlers | Wait for calico pods to be avalaible
+  #   command: kubectl get ds calico-node -o=jsonpath='{.status.numberReady}' --namespace=kube-system #--kubeconfig /root/.kube/config
+  #   register: avalaiblePods
+  #   until: expectedPods.stdout|int == avalaiblePods.stdout|int
+  #   retries: 20
+  #   delay: 6
+  #   failed_when: false
+  #   changed_when: false
+  #   run_once: true

@@ -1,0 +1,11 @@
+---
+#os-system: darwin
+cfssl_version: R1.2
+cfssl_bin_directory: /usr/local/bin
+
+#https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
+
+
+darwin: 'sha256:eb34ab2179e0b67c29fd55f52422a94fe751527b06a403a79325fed7cf0145bd'
+
+linux: 'sha256:eb34ab2179e0b67c29fd55f52422a94fe751527b06a403a79325fed7cf0145bd'

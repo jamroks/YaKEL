@@ -1,0 +1,53 @@
+---
+
+- name: create {{ kube_etc_dir }} directory
+  file:
+    path: "{{ kube_etc_dir }}"
+    state: directory
+
+- name: create {{ network_plugin_dir }} directory
+  file:
+    path: "{{ network_plugin_dir }}"
+    state: directory
+
+
+- name: copy kubelet kubeconfig
+  template:
+      src: kubelet.kubeconfig.j2
+      dest: "{{ kube_config.kubelet }}"
+      owner: root
+      group: root
+      mode: 0664
+  register: kubeconfig_event
+
+- name: create static pod manifests directory
+  file:
+    path: "/etc/kubernetes/manifests"
+    state: directory
+    mode: 0700
+
+- name: copy kubelet.service to remote
+  template:
+    src: kubelet.service.j2
+    dest: "/etc/systemd/system/kubelet.service"
+    owner: root
+    group: root
+    mode: 0664
+  register: systemd_event
+
+- name: call handlers in case of changed event
+  command: /bin/true
+  notify: KubeletHandlers | Restart kubelet
+  when: (systemd_event is changed) or (kubeconfig_event is changed)
+
+- meta: flush_handlers
+
+- name: download kubectl binary to current node
+  #tags: ['kubectl']
+  get_url:
+       url: "{{ binary.kube.mirror_url }}/kubectl"
+       dest: "/usr/bin/kubectl"
+       validate_certs: false
+       owner: root
+       group: root
+       mode: 0755

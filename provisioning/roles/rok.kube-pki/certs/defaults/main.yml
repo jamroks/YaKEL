@@ -1,0 +1,41 @@
+---
+
+kube_etc_dir: /etc/kubernetes
+etcd_install_dir: /etc/etcd
+
+tls_source_dir: "{{ playbook_dir }}/pki"
+
+kubeconfig_dir: "/root/.kube"
+
+adminUser:               'admin'
+adminGroup:              'system:masters'
+serviceAccountCName:     'kube-service-account'
+schedulerUser:           'system:kube-scheduler'
+controllerManagerUser:   'system:kube-controller-manager'
+kubeletUserPrefix:       'system:node'
+kubeletGroup:            'system:nodes'
+kubeproxyUserPrefix:     'system:kube-proxy'
+kubeproxyGroup:          'system:node-proxier'
+
+kubecert:
+  country: 'FR'
+  locality: 'BrickCity'
+  organisation: 'Kubernetes'
+  organizationalunit: 'OPS'
+  stateorprovince: 'PARIS'
+  expiry: '8760h'
+
+
+# etcd_certhosts:
+#   - 127.0.0.1
+#   - etcd0
+#   - etcd1
+#   - etcd2
+
+# apiserver_certhosts:
+#   - 127.0.0.1
+#   - 10.32.0.1
+#   - kubernetes
+#   - kubernetes.default
+#   - kubernetes.default.svc
+#   - kubernetes.default.svc.cluster.local

@@ -1,0 +1,101 @@
+---
+  # mkdir directories
+  - name: create kube certs directory
+    file:
+      path: "{{ kube_etc_dir }}/certs"
+      state: directory
+
+  - name: create etcd certs directory
+    file:
+       path: '{{ etcd_install_dir }}/certs'
+       state: directory
+    when: "'etcd' in group_names"
+  
+  - name: set facts for etcd cert dir
+    set_fact:
+        etcd_certs_dir: '{{ etcd_install_dir }}/certs'
+
+  - name: copy master node TLS assets
+    copy:
+      src:   "{{ tls_source_dir }}/certs/{{ item.src }}"
+      dest:  "{{ item.dest }}"
+      owner: root
+      group: root
+      mode:  0660
+    when: "'controlplane' in group_names"
+    with_items:
+      - { src: 'ca.pem',                                     dest: '{{ kube_etc_dir }}/certs/ca.pem' }
+      - { src: 'ca-key.pem',                                 dest: '{{ kube_etc_dir }}/certs/ca.key' }
+      - { src: 'etcd-client.pem',                            dest: '{{ kube_etc_dir }}/certs/etcd-client.pem' }
+      - { src: 'etcd-client-key.pem',                        dest: '{{ kube_etc_dir }}/certs/etcd-client-key.pem' }
+      - { src: 'apiserver-kubelet-client.pem',               dest: '{{ kube_etc_dir }}/certs/apiserver-kubelet-client.pem' }
+      - { src: 'apiserver-kubelet-client-key.pem',           dest: '{{ kube_etc_dir }}/certs/apiserver-kubelet-client-key.pem' }
+      - { src: '{{ inventory_hostname }}-apiserver.pem',     dest: '{{ kube_etc_dir }}/certs/apiserver.pem' }
+      - { src: '{{ inventory_hostname }}-apiserver-key.pem', dest: '{{ kube_etc_dir }}/certs/apiserver-key.pem' }
+      - { src: 'kube-scheduler.pem',                         dest: '{{ kube_etc_dir }}/certs/scheduler.pem' }
+      - { src: 'kube-scheduler-key.pem',                     dest: '{{ kube_etc_dir }}/certs/scheduler-key.pem' }
+      - { src: 'kube-controller-manager.pem',                dest: '{{ kube_etc_dir }}/certs/controller-manager.pem' }
+      - { src: 'kube-controller-manager-key.pem',            dest: '{{ kube_etc_dir }}/certs/controller-manager-key.pem' }
+
+
+  # copy kubelet and etcd-client certificates
+  - name: copy kubernetes node kubelet certificates
+    copy:
+      src:   "{{ tls_source_dir }}/certs/{{ item.src }}"
+      dest:  "{{ item.dest }}"
+      owner: root
+      group: root
+      mode:  0660
+    when: "['controlplane','worker'] | intersect(group_names) | length > 0"
+    with_items:
+      - { src: 'ca.pem',                                 dest: '{{ kube_etc_dir }}/certs/ca.pem' }
+      - { src: 'ca-key.pem',                             dest: '{{ kube_etc_dir }}/certs/ca.key' }
+      - { src: 'admin.pem',                              dest: '{{ kube_etc_dir }}/certs/admin.pem' }
+      - { src: 'admin-key.pem',                          dest: '{{ kube_etc_dir }}/certs/admin-key.pem' }
+      - { src: '{{ ansible_hostname }}-kubelet.pem',     dest: '{{ kube_etc_dir }}/certs/kubelet.pem' }
+      - { src: '{{ ansible_hostname }}-kubelet-key.pem', dest: '{{ kube_etc_dir }}/certs/kubelet-key.pem' }
+      - { src: 'etcd-client.pem',                        dest: '{{ kube_etc_dir }}/certs/etcd-client.pem' }
+      - { src: 'etcd-client-key.pem',                    dest: '{{ kube_etc_dir }}/certs/etcd-client-key.pem' }
+      - { src: 'kube-proxy.pem',                         dest: '{{ kube_etc_dir }}/certs/kube-proxy.pem' }
+      - { src: 'kube-proxy-key.pem',                     dest: '{{ kube_etc_dir }}/certs/kube-proxy-key.pem' }
+
+  # - name: copy kubernetes node kube-proxy certificates
+  #   copy:
+  #     src: "{{ tls_source_dir }}/certs/{{ item.src }}"
+  #     dest: "{{ item.dest }}"
+  #     owner: root
+  #     group: root
+  #     mode: 0660
+  #   when: "['controlplane','worker'] | intersect(group_names) | length > 0"
+  #   with_items:
+  #     - { src: '{{ ansible_hostname }}-kube-proxy.pem', dest: '{{ kube_etc_dir }}/certs/kube-proxy.pem' }
+  #     - { src: '{{ ansible_hostname }}-kube-proxy-key.pem', dest: '{{ kube_etc_dir }}/certs/kube-proxy-key.pem' }
+
+  
+  # copy etcd & etcd-client certificates
+  - name: copy etcd server certificate and key
+    copy:
+      src: "{{ tls_source_dir }}/certs/{{ item.src }}"
+      dest: "{{ item.dest }}"
+      owner: root
+      group: root
+      mode: 0664
+    when: "'etcd' in group_names"
+    with_items:
+      - { src: '{{ ansible_hostname }}-etcd.pem',         dest: '{{ etcd_certs_dir }}/etcd.pem' } 
+      - { src: '{{ ansible_hostname }}-etcd-key.pem',     dest: '{{ etcd_certs_dir }}/etcd-key.pem' }
+      - { src: 'etcd-client.pem',                           dest: '{{ etcd_certs_dir }}/etcd-client.pem' }
+      - { src: 'etcd-client-key.pem',                       dest: '{{ etcd_certs_dir }}/etcd-client-key.pem' }
+      - { src: 'ca.pem',                                    dest: '{{ etcd_certs_dir }}/ca.pem' }
+
+
+   # setup directories
+  # - name: create {{ kubeconfig_dir}} directory
+  #   file:
+  #     path: "{{ kubeconfig_dir }}"
+  #     state: directory
+    
+  # - name: copy kubectl config to remote
+  #   template: 
+  #     src: kubeconfig.j2 
+  #     dest: "{{ kubeconfig_dir }}/config"

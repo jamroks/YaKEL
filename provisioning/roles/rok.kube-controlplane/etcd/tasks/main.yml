@@ -1,0 +1,77 @@
+---
+
+  - name: Create etcd config dir
+    file:
+      path: /etc/etcd 
+      state: directory
+
+
+
+  - name: Download etcd binaries
+    get_url:
+      url: "{{ etcd_mirror_url }}/{{ binary.etcd.version }}/{{ binary.etcd.release }}.tar.gz"
+      dest: "/usr/local/src"
+      validate_certs: false
+    become: yes
+
+  - name: Unpack etcd binaries
+    unarchive:
+      src: "/usr/local/src/{{ binary.etcd.release }}.tar.gz"
+      dest: "/usr/bin"
+      remote_src: yes
+      mode: 0755
+      owner: root
+      group: root
+      extra_opts: [ '--strip-components=1' ]
+      exclude: ['Documentation', 'README-etcdctl.md', 'README.md', 'READMEv2-etcdctl.md']
+    become: yes
+
+  # - name: copy etcd bynary to "/usr/bin/"
+  #   copy:
+  #     src: "/usr/local/src/{{ item }}"
+  #     dest: "/usr/bin/{{ item }}"
+  #     mode: 0755
+  #     owner: root
+  #     remote_src: yes
+  #   with_items:
+  #       - etcd
+  #       - etcdctl
+
+  - name: Create etcd data dir
+    file:
+      path: /var/lib/etcd 
+      state: directory
+    become: true
+
+
+
+  - name: copy etcd.service to remote
+    template:
+      src: etcd.service.j2
+      dest: "/etc/systemd/system/etcd.service"
+      owner: root
+      group: root
+      mode: 664
+    notify:
+      - restart etcd service
+
+  - name: flush now to avoid double restart
+    meta: flush_handlers
+
+  - name: start etcd service
+    systemd:
+      name: "etcd.service"
+      state: started
+
+  - name: verify etcd is running
+    wait_for:
+       port: 2379
+       timeout: 60
+  
+  
+  - name: Verify etcd health
+    shell: "{{ binary.etcd.component.client }} --endpoint='https://127.0.0.1:2379/' --cert-file=/etc/etcd/certs/etcd-client.pem --key-file=/etc/etcd/certs/etcd-client-key.pem --ca-file=/etc/etcd/certs/ca.pem cluster-health"
+    register: running_result
+    until: running_result.stdout.find("cluster is healthy") != -1
+    retries: 5
+    delay: 5

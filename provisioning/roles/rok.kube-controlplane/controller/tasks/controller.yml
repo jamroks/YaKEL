@@ -1,0 +1,34 @@
+---
+
+  - name: copy controller-manager kubeconfig
+    template:
+      src: controller-kubeconfig.j2
+      dest: "/etc/kubernetes/controller-manager.kubeconfig"
+      owner: root
+      group: root
+      mode: 0664
+    register: kubeconfig_event
+
+
+  - name: copy controller-manager systemd service file
+    template:
+         src: kube-controller.service.j2
+         dest: '/etc/systemd/system/kube-controller.service'
+         owner: root
+         group: root
+         mode: 0664
+    register: systemd_event
+    
+  
+  - name: call handlers in case of changed event
+    command: /bin/true
+    notify: ControllerHandlers | Restart kube-controller-manager
+    when: "(kubeconfig_event is changed) or (systemd_event is changed)"
+
+
+  - meta: flush_handlers
+
+  - name: ensure controller-manager is running
+    systemd:
+         name: kube-controller.service
+         state: started

@@ -1,0 +1,43 @@
+---
+
+kubelet_schedulable: '{% if "worker" in group_names %}true{% else %}false{% endif %}'
+
+kubelet_master_only: '{% if inventory_hostname in groups["controlplane"] and inventory_hostname not in groups["worker"] %}true{% else %}false{% endif %}'
+
+kubelet_overrides:
+    'fail-swap-on': 'false'
+
+kubelet_opts:
+  'allow-privileged': 'true'
+  'authorization-mode': 'Webhook'
+  'authentication-token-webhook': 'true'
+  'anonymous-auth': 'false'
+  'cluster-dns': '{{ cluster.networking.dns_service_ip }}'
+  'cluster-domain': '{{ cluster.domain }}'
+  'container-runtime': 'docker'
+  'event-qps': '2'
+  'network-plugin': 'cni'
+  'cni-bin-dir': '/opt/cni/bin'
+  'cni-conf-dir': '/etc/cni/net.d'
+  'docker': 'unix:///var/run/docker.sock'
+  'hostname-override': '{{ inventory_hostname }}'
+  'alsologtostderr': 'true'
+  'fail-swap-on': 'false'
+  'kubeconfig': '{{ kube_config.kubelet }}'
+  'node-labels': '{%  if "controlplane" in group_names %},node-role.kubernetes.io/master=
+                  {%-   if not kubelet_master_only|bool %},node-role.kubernetes.io/node={% endif %}
+                  {%- else %}node-role.kubernetes.io/node=
+                  {%- endif %}'
+  'node-ip': '{{ prefered_iface }}'
+  'pod-infra-container-image': '{{ images.pause.name }}:{{ images.pause.version }}'
+  'pod-manifest-path': '{{ kube_manifests_dir }}'
+  'register-with-taints': '{%  if "controlplane" in group_names %}node-role.kubernetes.io/master=:NoSchedule{% endif %}'
+  'serialize-image-pulls': 'false'
+  'feature-gates': 'SupportIPVSProxyMode=true'
+  'client-ca-file': '/etc/kubernetes/certs/ca.pem'
+  'tls-cert-file': '/etc/kubernetes/certs/kubelet.pem'
+  'tls-private-key-file': '/etc/kubernetes/certs/kubelet-key.pem'
+  'v': '2'
+
+#  'pod-cidr': '{{ cluster.networking.pod_cidr_address }}'
+# kubelet-certificate-authority string

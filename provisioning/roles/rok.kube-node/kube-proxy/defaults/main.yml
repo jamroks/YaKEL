@@ -1,0 +1,16 @@
+---
+
+kubeproxy_opts:
+  "cluster-cidr": "{{ cluster.networking.pod_cidr_address }}"
+  "bind-address": "0.0.0.0"
+  #"master": "{% if 'controlplane' in group_names %}https://127.0.0.1:6443{% else %}{{ server.controlplane.nodes[0].ip }}:6443{% endif %}"
+  "kubeconfig": "{{ kube_config.kubeproxy }}"
+  "hostname-override": "{{ inventory_hostname }}"
+  "feature-gates": "SupportIPVSProxyMode=true"
+  "cleanup-ipvs": "true"
+  "proxy-mode": "ipvs"
+  "profiling": "false"
+  "ipvs-min-sync-period": "5s"
+  "ipvs-sync-period": "5m"
+  "ipvs-scheduler": "rr"
+  "v": "2"

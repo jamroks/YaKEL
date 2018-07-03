@@ -1,0 +1,14 @@
+---
+
+- name: install nfs-utils yum pkg
+  yum:
+     name: nfs-utils
+     state: present
+  register: nfs_yum_utils_yum
+  until: nfs_yum_utils_yum is success
+  retries: 3
+  delay: 3
+
+
+- name: Task install | kubelet configuration
+  import_tasks: setup.yml

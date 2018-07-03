@@ -1,0 +1,49 @@
+---
+
+traefik_opts:
+  "debug": "true"
+  "api": "true"
+  "api.dashboard": "true"
+  "ping": "true"
+  "ping.entrypoint": "http"
+  "checknewversion": "false"
+  "loglevel": "DEBUG"
+  "defaultentrypoints": "http"
+  "entrypoints": "Name:http Address::80"
+  "kubernetes": "true"
+  "kubernetes.watch": "true"
+  "kubernetes.debugloggeneratedtemplate": "true"
+  "kubernetes.trace": "true"
+  "web.statistics": "true"
+
+
+
+  # - -d
+  # - --api
+  # - --api.dashboard=true
+  # - --ping
+  # - --ping.entrypoint=http
+  # - --checknewversion=false
+  # - --loglevel=DEBUG
+  # - --defaultentrypoints=http,https
+  # - --entrypoints=Name:http Address::80
+  # - --entrypoints=Name:https Address::443 TLS
+  # - --kubernetes=true
+  # - --kubernetes.watch=true
+  # - --kubernetes.enablepasstlscert=true
+  # - --kubernetes.debugloggeneratedtemplate=true
+  # - --kubernetes.trace=true
+  # - --kubernetes.namespaces  Kubernetes namespaces   (default "[]")
+  # - --web.address  Web administration port  (default ":8080")
+  # - --web.certfile                             SSL certificate
+  # - --web.keyfile                              SSL certificate
+  # - --web.statistics=true                           Enable more detailed statistics  (default "false")
+
+
+# If set to true invalid SSL certificates are accepted for backends.
+# This disables detection of man-in-the-middle attacks so should only be used on secure backend networks.
+#
+# Optional
+# Default: false
+#
+# InsecureSkipVerify = true

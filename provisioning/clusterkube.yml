@@ -1,0 +1,188 @@
+---
+
+### CACERTS
+- hosts: localhost
+  name: Start <Play> PKI
+  any_errors_fatal: true
+  tags: ['certs', 'kubectl']
+  tasks:
+
+  #- name: start <block> | certs generation block
+
+  - name: start <role> | call pki install
+    import_role:
+           name: rok.kube-pki/cfssl
+           tasks_from: installcfssl
+
+  - name: start <role> | create json ssl file
+    import_role:
+            name: rok.kube-pki/certs
+            tasks_from: generate_json
+  
+  - name: start <role> |  create pem cert file
+    import_role:
+            name: rok.kube-pki/certs
+            tasks_from: generate_certs
+
+  - name: start <role> | local kubectl
+    import_role:
+            name: rok.kubectl
+            tasks_from: kubectl
+    
+
+### Upload Certs to cluster
+- hosts: cluster:etcd
+  name: Start <Play> Certs Upload
+  any_errors_fatal: true
+  tags: ['certs_upload']
+  tasks:
+
+  - name: start <role> | upload certs
+    become: true
+    include_role:
+      name: rok.kube-pki/certs
+      tasks_from: upload_certs
+
+  - name: start <role> | upload kubeconfig
+    become: true
+    include_role:
+      name: rok.kube-pki/certs
+      tasks_from: kubeconfig
+
+
+#### CONTROL PLANE
+- hosts: controlplane:etcd
+  name: Start <Play> Kube ControlPlane Component
+  tags: ['controlplane']
+  any_errors_fatal: true
+  become: yes
+  environment:
+    KUBECONFIG: "{{ kube_config.kubectl }}"
+  pre_tasks:
+      - name: "download kube controlplane binaries"
+        tags: ['apiserver', 'scheduler', 'manager']
+        get_url:
+            url: "{{ binary.kube.mirror_url }}/{{ item }}"
+            dest: /usr/bin/{{ item }}
+            mode: 0755
+        with_items: "{{ binary.kube.component.controlplane }}"
+        register: result
+        until: result is succeeded
+        retries: 2
+        delay: 1
+  tasks:
+
+  - name: start <role> | call etcd
+    tags: ['etcd']
+    import_role:
+        name: rok.kube-controlplane/etcd
+    when: "'etcd' in group_names"
+
+
+  - name: start <role> | call kube-apiserver
+    tags: ['apiserver']
+    import_role:
+        name: rok.kube-controlplane/apiserver
+        tasks_from: apiserver
+
+
+  - name: start <role> | call kube-scheduler
+    tags: ['scheduler']
+    import_role:
+        name: rok.kube-controlplane/scheduler
+        tasks_from: scheduler
+
+
+  - name: start <role> | call kube-controller
+    tags: ['controller-manager']
+    import_role:
+        name: rok.kube-controlplane/controller
+        tasks_from: controller
+
+
+#### KUBENODE : DOCKER, KUBELET, PROXY
+- hosts: cluster
+  name: Start <Play> Kube Node Component
+  become: yes
+  tags: ['worker']
+  any_errors_fatal: true
+  environment:
+    KUBECONFIG: "{{ kube_config.kubectl }}"
+  pre_tasks:
+      - name: "download kube node binaries"
+        tags: ['kubelet', 'kube-proxy', 'docker']
+        get_url:
+            url: "{{ binary.kube.mirror_url }}/{{ item }}"
+            dest: /usr/bin/{{ item }}
+            mode: 0755
+        with_items: "{{ binary.kube.component.node }}"
+        register: result
+        until: result is succeeded
+        retries: 2
+        delay: 1
+
+  tasks:
+
+  - name: start <role> | call docker
+    import_role:
+        name: rok.kube-node/docker
+    tags: ['docker']
+
+
+  - name: start <role> | call kube-node
+    tags: ['kubelet']
+    import_role:
+       name: rok.kube-node/kubelet
+       tasks_from: kubelet
+
+
+  - name: start <role> | call kube-proxy
+    tags: ['kube-proxy']
+    import_role:
+        name: rok.kube-node/kube-proxy
+        tasks_from: kube-proxy # With Ipvs mode instead of the default iptables mode
+
+
+## NETWORKING : CALICO
+- hosts: controlplane
+  any_errors_fatal: true
+  name: Start <Play> Calico Network Deployment
+  tags: ['network']
+  become: yes
+  environment:
+    KUBECONFIG: "{{ kube_config.kubectl }}"
+  pre_tasks:
+      - name: "download calico images"
+        command: docker pull {{ item }}
+        with_items:
+          - "{{ images.calico_node.name }}:{{ images.calico_node.version }}"
+          - "{{ images.calico_cni.name }}:{{ images.calico_cni.version }}"
+#          - "{{ images.calico_ctl.name }}:{{ images.calico_ctl.version }}"
+        register: result
+        until: result is succeeded
+        retries: 2
+        delay: 1
+  tasks:
+
+  - name: start <role> | call kube-calico
+    tags: ['calico']
+    import_role:
+        name: rok.kube-network/calico
+        tasks_from: calico-cni
+
+
+## Service Discovery: with CoreDNS instead of the default kube-dns
+- hosts: controlplane
+  any_errors_fatal: true
+  name: Start <Play> CoreDNS Deployment  
+  tags: ['dns']
+  become: yes
+  environment:
+    KUBECONFIG: "{{ kube_config.kubectl }}"
+  tasks:
+
+  - name: start <role> | call coreDNS
+    tags: ['coredns']
+    import_role:
+        name: rok.kube-apps/coredns
+        tasks_from: coreDNS

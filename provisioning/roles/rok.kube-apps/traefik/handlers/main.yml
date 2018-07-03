@@ -1,0 +1,50 @@
+---
+
+  - name: TraefikHandlers | Verify
+    command: /bin/true
+    notify:
+      - TraefikHandlers | Get expected number of traefik pods
+      - TraefikHandlers | Wait for traefik pods to be Ready
+      - TraefikHandlers | Fail if Traefik pods are not avalaible
+  
+
+  - name: TraefikHandlers | Get expected number of traefik pods
+    command: kubectl get ds traefik  -o=jsonpath='{.status.desiredNumberScheduled}' -n kube-system
+    register: expectedPodsReplicas
+    until: expectedPodsReplicas.stdout|int > 0
+    retries: 20
+    delay: 6
+    run_once: true
+    changed_when: false
+
+  - name: TraefikHandlers | Wait for traefik pods to be Ready
+    command: kubectl get ds traefik  -o=jsonpath='{.status.numberReady}' -n kube-system
+    register: avalaiblePodsReplicas
+    until: expectedPodsReplicas.stdout|int == avalaiblePodsReplicas.stdout|int
+    retries: 20
+    delay: 6
+    failed_when: false
+    changed_when: false
+    run_once: true
+
+  - name: TraefikHandlers | Fail if Traefik pods are not avalaible
+    fail:
+       msg: "Timed out waiting for traefik pods to be ready."
+    run_once: true
+    when: avalaiblePodsReplicas.stdout|int != 1
+
+
+    # - block:
+    #   - name: Traefik |  Get expected number of coreDNS replica
+    #     command: kubectl get ds traefik-ingress-controller -n kube-system -o jsonpath='{.status.availableReplicas}'
+    #     register: availableReplicas
+    #     until: availableReplicas.stdout|int == 1
+    #     retries: 24
+    #     delay: 10
+    #     failed_when: false
+    
+    #   - name: Traefik |  fail if any traefik ingress pods are not ready
+    #     fail:
+    #       msg: "Timed out waiting for traefik-ingress-controller pods to be in the ready state."
+    #     when: availableReplicas.stdout|int != 1
+    #   when: pod_validate|bool == true

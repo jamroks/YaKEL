@@ -1,0 +1,41 @@
+---
+
+# - name: set fact
+#   set_fact:
+#     pod_validate: true
+
+- name: Traefik | create specs directory
+  file:
+    path: "/etc/kubernetes/specs"
+    state: directory
+
+
+- name: Traefik | copy traefik deployments manifests to specs dir
+  #tags: ['traefik_opts']
+  template:
+      src: "{{ item.name }}.j2"
+      dest: "{{ item.dest }}"
+      owner: root
+      group: root
+      mode: 0660
+  with_items:
+        - { name: traefik-rbac.yml,         dest: '{{ kube_spec_dir }}/traefik-rbac.yml' }
+        - { name: traefik-ds.yml,           dest: '{{ kube_spec_dir }}/traefik-ds.yml' }
+        - { name: traefik-ui.yml,           dest: '{{ kube_spec_dir }}/traefik-ui.yml' }
+  register: traefik_manifests
+
+- name: Traefik | Create traefik rBac
+  command: kubectl apply -f /etc/kubernetes/specs/traefik-rbac.yml
+
+
+- name: Traefik | Start traefik daemontSet
+  command: kubectl apply -f /etc/kubernetes/specs/traefik-ds.yml
+  notify: TraefikHandlers | Verify
+
+- name: trigger handlers now
+  meta: flush_handlers
+  
+- name: Traefik | Start traefik ingress resource admin-ui
+  command: kubectl apply -f /etc/kubernetes/specs/traefik-ui.yml
+
+

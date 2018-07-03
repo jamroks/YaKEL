@@ -1,0 +1,6 @@
+---
+
+dns:
+  provider: coreDNS
+  cluster_dns_service_ip: '172.20.0.2'
+  replicas: 1

@@ -1,0 +1,95 @@
+---
+
+etcd_version: 'v3.2.11'
+kube_version: "{{ cluster.kubernetes_version | default('v1.10.0') }}"
+helm_version: 'helm-v2.8.0'
+istio_version: '0.7.1'
+
+platform_arch: "{{ (ansible_architecture == 'armv6l') | ternary('aarch','amd64') }}"
+kube_mirror_url: 'https://storage.googleapis.com/kubernetes-release/release'
+etcd_mirror_url: 'https://storage.googleapis.com/etcd'
+istio_mirror_url: 'https://storage.googleapis.com/istio-release/releases'
+
+helm_mirror_url: 'https://storage.googleapis.com/kubernetes-helm'
+helm_pkg_sha256sum: "{% if ansible_system == 'Darwin' %}{{ sha256_darwin }}{% else %}{{ sha256_linux }}{% endif %}"
+
+etcd_cluster_list: "https://{{ server.etcd.nodes[0].nodename }}:2379"
+kube_master_apiserver_count: "{{ groups['controlplane'] | length }}"
+
+kube_spec_dir: '/etc/kubernetes/specs'
+kube_manifests_dir: '/etc/kubernetes/manifests'
+kube_etc_dir: /etc/kubernetes
+
+kube_config:
+   kubelet: "{{ kube_etc_dir }}/kubelet.kubeconfig"
+   kubectl: '/root/.kube/config'
+   calico: '/etc/calico/calico.kubeconfig'
+   kubeproxy: "{{ kube_etc_dir }}/kubeproxy.kubeconfig"
+
+tls_source_dir: "{{ playbook_dir }}/pki"
+
+kube_master_secure_port: "{{ secure_port | default('6443')}}"
+
+network_plugin_dir: '/etc/cni/net.d'
+
+
+binary:
+    etcd:
+       version: "{{ etcd_version }}"
+       mirror_url: "{{ etcd_mirror_url }}"
+       release: "etcd-{{ etcd_version }}-{{ ansible_system | lower}}-{{ platform_arch }}"
+       component:
+           server:
+             etcd
+           client:
+             etcdctl
+    kube:
+       version: "{{ kube_version }}"
+       mirror_url: '{{ kube_mirror_url }}/{{ kube_version }}/bin/{{ ansible_system | lower}}/{{ platform_arch }}'
+       component:
+           node:
+            - kube-proxy
+            - kubelet
+            - kubectl
+           controlplane:
+            - kube-apiserver
+            - kube-scheduler
+            - kube-controller-manager
+
+images:
+
+    pause:
+       name: gcr.io/google_containers/pause-amd64
+       version: 3.0
+
+    kubernetes_dashboard:
+       name: gcr.io/google_containers/kubernetes-dashboard-amd64
+       version: v1.8.3
+
+    calico_node:
+       name: quay.io/calico/node
+       version: v3.1.0
+
+    calico_cni:
+       name: quay.io/calico/cni
+       version: v3.1.0
+    
+    coredns:
+       name: coredns/coredns
+       version: 1.1.0
+
+    heapster:
+       name: gcr.io/google_containers/heapster-amd64
+       version: v1.5.0
+
+    influxdb:
+       name: gcr.io/google_containers/heapster-influxdb-amd64
+       version: v1.3.3
+
+    traefik:
+        name: traefik
+        version: v1.6-alpine
+
+    haproxy:
+       name: quay.io/jcmoraisjr/haproxy-ingress
+       version: v0.5-beta.1

@@ -1,0 +1,82 @@
+
+---
+
+- name: make json cfssl config dir
+  file:
+    state: directory
+    path: "{{ tls_source_dir }}/json"
+
+- name: make certs ouput dir from cfssl
+  file:
+    state: directory
+    path: "{{ tls_source_dir }}/certs"
+
+
+- name: Extract CA Template CFSSL Json Config files
+  template:
+    src: ca-config.json.j2
+    dest: "{{ tls_source_dir }}/json/ca-config.json"
+
+- name: Extract CAR-CSR Template CFSSL Json Config files
+  template:
+    src: ca-csr.json.j2
+    dest: "{{ tls_source_dir }}/json/ca-csr.json"
+
+
+- name: Extract Etcd Template CFSSL Json Config files.
+  template:
+    src: etcd.json.j2
+    dest: "{{ tls_source_dir }}/json/{{ item.nodename }}-etcd.json"
+  with_items: "{{ server.etcd.nodes }}"
+
+
+- name: Extract Api-Server Template CFSSL Json Config files
+  template:
+    src: apiserver.json.j2
+    dest: "{{ tls_source_dir }}/json/{{ item.nodename }}-apiserver.json"
+  with_items: "{{ server.controlplane.nodes }}"
+
+- name: Extract Controler Manager Template CFSSL Json Config files
+  template:
+    src: controller-manager.json.j2
+    dest: "{{ tls_source_dir }}/json/kube-controller-manager.json"
+
+- name: Extract Scheduler Template CFSSL Json Config files
+  template:
+    src: kube-scheduler.json.j2
+    dest: "{{ tls_source_dir }}/json/kube-scheduler.json"
+
+- name: Extract kubelet-client Template CFSSL Json Config files
+  template:
+    src: kubelet-client.json.j2
+    dest: "{{ tls_source_dir }}/json/apiserver-kubelet-client.json"
+  #with_items: "{{ server.controlplane.nodes }}"
+
+- name: Extract Node Kubelet Template CFSSL Json Config files
+  template:
+    src: kubelet.json.j2
+    dest: "{{ tls_source_dir }}/json/{{ item.nodename }}-kubelet.json"
+  with_items: "{{ server.controlplane.nodes + server.worker.nodes  }}"
+
+- name: Extract Kube-proxy Template CFSSL Json Config files
+  template:
+    src: kube-proxy.json.j2
+    dest: "{{ tls_source_dir }}/json/kube-proxy.json"
+  #with_items: "{{ server.controlplane.nodes + server.worker.nodes }}"
+
+
+- name: Extract Etcd-Client Template CFSSL Json Config files
+  template:
+    src: etcd-client.json.j2
+    dest: "{{ tls_source_dir }}/json/etcd-client.json"
+
+- name: Extract AdminUser Template CFSSL Json Config files
+  template:
+    src: admin.json.j2
+    dest: "{{ tls_source_dir }}/json/admin.json"
+
+# - name: Extract Service Account Template CFSSL Json Config files
+#   template:
+#     src: service-account.json.j2
+#     dest: "{{ tls_source_dir }}/json/service-account.json"
+

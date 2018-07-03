@@ -1,0 +1,16 @@
+---
+
+  - name: IPVS | Modprode Kernel Module for IPVS
+    modprobe:
+      name: "{{ item }}"
+      state: present
+    with_items: '{{ ipvs_kernel_modules }}'
+
+
+  - name: IPVS | Boot Time Kernel Modules /etc/modules
+    lineinfile:
+      path: /etc/modules 
+      line: '{{ item }}'
+      create: yes 
+      state: present
+    with_items: '{{ ipvs_kernel_modules }}'

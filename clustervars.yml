@@ -1,0 +1,126 @@
+---
+
+  #### -- vagrant vbox variables
+vagrant:
+  domain_tld: "kubelab.ops"
+  box: "centos/7" 
+  vbox_guest_version: '5.2.8'
+  timezone: "Europe/Paris"
+  ntp_area: "fr"
+  gui:
+    enabled: false
+  ssh:
+    forward_agent: true
+    ssh_key_path: "~/.vagrant.d/insecure_private_key"
+    insert_key: false
+    shell: "bash -c 'BASH_ENV=/etc/profile exec bash'"
+  vm_opts:
+    ioapic: "on"
+    dnsresolver: "on"
+  hostmanager:
+    enabled: true
+    manage_host: true
+    manage_guest: false
+    offline_enabled: false
+    private_ip_disabled: false
+  landrush:
+    enabled: true
+    tld: 'kubelab.ops'
+    interface: 'eth1'
+    class: 'ipv4'
+    redirect_guest: false
+  sync:
+    src: '.'
+    dest: '/vagrant'
+    id: 'vagrant-root'
+    disabled: true
+
+### -- kubernetes / ansible extra vars 
+
+cluster:
+    name: "local"
+    domain: "cluster.local"
+    kubernetes_version: 'v1.10.0'
+    networking:
+          pod_cidr_address: "172.16.0.0/16"
+          service_cidr_address: "172.20.0.0/16"
+          dns_service_ip: "172.20.0.2"
+
+### -- kubernetes / ansible extra vars  
+ingress:
+    edge:
+      route: apps.kubelab.ops
+      address: 192.168.32.8
+      vagrant_enabled: false
+      nodename: node05
+
+### -- kubernetes / ansible extra vars / vagrant vmbox variables
+server:
+    etcd: ## etcd is for ansible only. etcd is on same vm as master
+        nodes:
+        - nodename: wakanda
+          fqdn: 'wakanda.kubelab.ops'
+          vagrant_enabled: false # no need to create the vm, i just need it for host group logic in playbook
+          ip: 192.168.32.7
+    controlplane:
+        nodes:
+        - nodename: wakanda
+          fqdn: 'wakanda.kubelab.ops'
+          #ingress: apps.kubelab.ops # for web browser facing application
+          aliases: 'wakanda'
+          vagrant_enabled: true
+          ip: 192.168.32.7
+          cpu: 2
+          ram: 2048
+    worker:
+        nodes:
+        - nodename: node05
+          fqdn: 'node05.kubelab.ops'
+          aliases: node05
+          vagrant_enabled: true
+          ip: 192.168.32.8
+          cpu: 1
+          ram: 1024
+        - nodename: node06
+          fqdn: 'node06.kubelab.ops'
+          aliases: node06
+          vagrant_enabled: true
+          ip: 192.168.32.9
+          cpu: 1
+          ram: 1024
+
+### -- vagrant ansible provisioner variables
+provisioner:
+    type: 'ansible'
+    limit: "ROK8LABZ:localhost"
+    extra_vars: 'clustervars.yml'
+    verbose: "vv"
+    config_file: 'provisioning/ansible.cfg'
+    play:
+      clusterplan: 'provisioning/clusterplan.yml'
+      clusterkube: 'provisioning/clusterkube.yml'
+      clusterapps: 'provisioning/clusterapps.yml'
+    tags:
+      plan: ["nmcli", "ipvs", "ntp", "hosts", "repo", "sysctl", "yum"]
+      kube: ["controlplane", "certs", "certs_upload", "worker", "network", "dns", "kubeconfig"]
+      apps: ["heapster", "dashboard", "traefik"]
+
+### -- ansible groupvars & hostvars that get in the vagrant generated inventory --> (relative to Vagrantfile dir ) .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory
+    ansible_groups: {
+        ROK8LABZ: ["wakanda", "node05", "node06"],
+        'ROK8LABZ:children': ["cluster", "etcd", "storage", "ingress"],
+        'ROK8LABZ:vars': { ansible_become: true, ansible_user: 'vagrant' },
+        'cluster:children': ["controlplane", "worker"],
+        'cluster:vars': { docker_version:  '18.03.0', authorization_modes: ['RBAC', 'Node'] },
+        controlplane: ["wakanda"],
+        'controlplane:vars': { secure_port: '6443', insecure_port: '8080' },
+        worker: ["node05", "node06"],
+        etcd: ["wakanda"],
+        storage: ["wakanda"],
+        ingress: ["node05"]
+    }
+    ansible_host_vars: {
+                wakanda: { prefered_iface: '192.168.32.7', prefered_device: 'eth1'},
+                node05: { prefered_iface: '192.168.32.8', prefered_device: 'eth1'},        
+                node06: { prefered_iface: '192.168.32.9', prefered_device: 'eth1'}
+    }

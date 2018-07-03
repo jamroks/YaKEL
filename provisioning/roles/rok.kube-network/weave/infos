@@ -1,0 +1,24 @@
+$ git clone https://github.com/containernetworking/plugins 
+$ cd plugins
+$ ./build.sh
+$ sudo cp bin/* /opt/cni/bin/
+$ sudo sh -c 'cat >/etc/cni/net.d/10-mynet.conflist <<-EOF
+{
+    "cniVersion": "0.3.0",
+    "name": "mynet",
+      "plugins": [
+        {
+            "name": "weave",
+            "type": "weave-net",
+            "hairpinMode": true
+        },
+        {
+            "type": "portmap",
+            "capabilities": {"portMappings": true},
+            "snat": true
+        }
+    ]
+}
+EOF'
+$ rm /etc/cni/net.d/10-weave.conf
+$ kubectl delete po --all --namespace=kube-system  

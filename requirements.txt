@@ -1,0 +1,4 @@
+ansible-lint
+netaddr
+jmespath
+Jinja2>=2.10

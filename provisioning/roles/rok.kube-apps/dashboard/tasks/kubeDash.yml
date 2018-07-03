@@ -1,0 +1,39 @@
+---
+
+  - name: set fact
+    set_fact:
+      pod_validate: true
+
+  - name: create specs directory
+    file:
+      path: "/etc/kubernetes/specs"
+      state: directory
+
+  - name: copy dashboard
+    template:
+      src: "{{ item }}.j2"
+      dest: "/etc/kubernetes/specs/{{ item }}"
+    with_items:
+        - dashboard-lab.yml
+        - dashboard-ingress.yml
+
+  - name: register ingress ressources for dashboard
+    command: kubectl apply -f /etc/kubernetes/specs/dashboard-ingress.yml
+
+  - name: start dashboard service
+    command: kubectl apply -f /etc/kubernetes/specs/dashboard-lab.yml
+    notify: dashboardHandlers | Verify 
+
+
+  - name: trigger handlers now as we need it
+    meta: flush_handlers
+
+
+
+  # - name: generate kubeconfig for admin dashboard
+  #   import_tasks: adminDash.yml
+  #   tags: ['admin-dash']
+
+
+   
+

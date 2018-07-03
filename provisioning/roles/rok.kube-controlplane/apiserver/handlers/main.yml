@@ -1,0 +1,27 @@
+---
+
+- name: ApiServerHandlers | Restart kube-apiserver
+  command: /bin/true
+  notify:
+    - ApiServerHandlers | reload and restart apiserver service
+    - ApiServerHandlers | wait up to 2 Minutes for the apiserver to be running
+
+
+- name: ApiServerHandlers | reload and restart apiserver service
+  systemd:
+      name: kube-apiserver.service
+      state: restarted
+      enabled: yes
+      daemon_reload: True
+
+
+- name: ApiServerHandlers | wait up to 2 Minutes for the apiserver to be running 
+  uri:
+    url: "http://127.0.0.1:8080/healthz"
+    status_code: 200
+  register: result
+  until: "result.status == 200"
+  retries: 25
+  delay: 6
+
+

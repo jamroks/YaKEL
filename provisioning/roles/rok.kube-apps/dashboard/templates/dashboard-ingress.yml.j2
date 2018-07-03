@@ -1,0 +1,23 @@
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kubernetes-dashboard
+  namespace: kube-system
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    #traefik.ingress.kubernetes.io/preserve-host: "true"
+    traefik.frontend.rule.type: PathPrefix
+spec:
+  rules:
+  - host: dashboard.{{ ingress.edge.route }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: kubernetes-dashboard
+          servicePort: 80
+  # tls:
+  # - hosts:
+  #   - dashboard.apps.roklab.ops
+  #   secretName: apps-tls-cert

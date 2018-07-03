@@ -1,0 +1,26 @@
+---
+
+- name: ControllerHandlers | Restart kube-controller-manager
+  command: /bin/true
+  notify:
+    - ControllerHandlers | reload and restart apiserver service
+    - ControllerHandlers | wait for kube-controller-manager
+
+#ControllerHandlers | Restart kube-controller-manager
+
+- name: ControllerHandlers | reload and restart apiserver service
+  systemd:
+      name: kube-controller.service
+      state: restarted
+      enabled: yes
+      daemon_reload: True
+
+
+- name: ControllerHandlers | wait for kube-controller-manager
+  uri:
+    url: http://localhost:10252/healthz
+    status_code: 200
+  register: controller_manager_result
+  until: "controller_manager_result.status == 200"
+  retries: 15
+  delay: 5

@@ -1,0 +1,33 @@
+---
+
+  - name: manage yum repo
+    import_tasks: repo.yml
+    tags: ['repo']
+
+  - name: manage ntp
+    import_tasks: ntp.yml
+    tags: ['ntp']
+
+  - name: manage NetworkManager
+    import_tasks: nmcli.yml
+    tags: ['nmcli']
+
+  - name: manage /etc/hosts
+    import_tasks: hosts.yml
+    tags: ['hosts']
+
+  - name: manage sysctl & sshd
+    import_tasks: sysctl.yml
+    tags: ['sysctl']
+
+  - name: manage ipvs kernel modules
+    import_tasks: ipvs.yml
+    tags: ['ipvs']
+
+  - name: manage selinux
+    import_tasks: selinux.yml
+    tags: ['selinux']
+
+  # - name: manage vbox guest addition
+  #   import_tasks: vbox.yml
+  #   tags: ['vbox']

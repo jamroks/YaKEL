@@ -1,0 +1,14 @@
+---
+
+- name: dashboardHandlers | Verify
+  command: /bin/true
+  notify:
+      - dashboardHandlers | Wait for dashboard pods to be ready
+
+- name: dashboardHandlers | Wait for dashboard pods to be ready
+  command: kubectl get deployment kubernetes-dashboard -n kube-system -o jsonpath='{.status.availableReplicas}'
+  register: readyReplicas
+  until: readyReplicas.stdout|int == 1
+  retries: 24
+  delay: 10
+  #failed_when: false

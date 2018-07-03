@@ -1,0 +1,34 @@
+---
+  - name: Heapster | create specs directory
+    file:
+      path: "{{ kube_spec_dir }}"
+      state: directory
+
+  - name: Heapster | copy deployments manifests
+    template:
+      src: "{{ item.file }}.j2"
+      dest: "{{ kube_spec_dir }}/{{ item.file }}"
+      owner: root
+      group: root
+      mode: 0660
+    with_items:
+        - { name: heapster-rbac, file: heapster-rbac.yml, type: rbac }
+        - { name: influxdb, file: influxdb.yml, type: dpm }
+        - { name: heapster, file: heapster.yml, type: dpm }
+    register: heapster_node_manifests
+
+  - name: Heapster | create heapster rolebinding
+    command: kubectl apply -f "{{ kube_spec_dir }}/heapster-rbac.yml"
+
+  - name: Heapster | start influxdb controller
+    command: kubectl apply -f {{ kube_spec_dir }}/influxdb.yml
+
+
+  - name: Heapster | start heapster controller
+    command: kubectl apply -f {{ kube_spec_dir }}/heapster.yml
+
+  - block:
+    - name: Heapster | validate heapster pods  # don't verify if user is going to create their own PVC/PV
+      include_tasks: validate.yml
+      when: "heapster.options.influxdb.pvc_name is not defined or heapster.options.influxdb.pvc_name == ''"
+    when: "run_pod_validation|bool == true"

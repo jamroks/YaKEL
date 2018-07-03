@@ -1,0 +1,16 @@
+{
+  "CN": "{{ adminUser }}",
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "{{ kubecert.country }}",
+      "L": "{{ kubecert.locality }}",
+      "O": "{{ adminGroup }}",
+      "OU": "{{ kubecert.organizationalunit }}",
+      "ST": "{{ kubecert.stateorprovince }}"
+    }
+  ]
+}

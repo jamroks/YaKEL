@@ -1,0 +1,15 @@
+
+
+kube_spec_dir: /etc/kubernetes/specs
+
+run_pod_validation: true
+
+
+heapster:
+      enabled: true
+      options:
+          influxdb:
+              pvc_name: ""
+          replicas: 1
+          service_type: ClusterIP
+          sink: 'influxdb:http://heapster-influxdb.kube-system.svc:8086'

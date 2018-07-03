@@ -1,0 +1,41 @@
+---
+
+
+#### KUBE APPS
+- hosts: controlplane
+  any_errors_fatal: true
+  name: Start <Play> Deploy Kube Apps Component
+  tags: ['apps']
+  become: yes
+  environment:
+    KUBECONFIG: "{{ kube_config.kubectl }}"
+
+  tasks:
+
+  - name: start <Role> | Deploy Heapster
+    tags: ['heapster']
+    import_role:
+        name: rok.kube-apps/heapster
+        tasks_from: heapStart
+
+
+  - name: start <Role> | Deploy Dashboard
+    tags: ['dashboard']
+    import_role:
+        name: rok.kube-apps/dashboard
+        tasks_from: kubeDash
+
+  - name: Deploy Traefik Ingress Controler
+    tags: ['traefik']
+    import_role:
+         name: rok.kube-apps/traefik
+
+
+
+# spinnaker.apps.roklab.ops
+# dashboard.apps.roklab.ops
+# weavescope.apps.rokalb.ops
+# traefik.apps.rokalb.ops
+# jenkins.apps.roklab.ops
+# http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
+# - { role: kube-apps/spinnaker, tags: ['spinnaker'], when: spinnaker.enabled|bool == true }
