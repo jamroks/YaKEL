@@ -23,7 +23,7 @@ endif::[]
 
 [Abstract]
 == Abstract
-Yakil (Yet Another Kubernetes Environment Lab) is an ansible lightweight playbook for fast installation (in less than 10 minutes) of a kubernetes lab of 3 hosts that can fit on your laptop, which I realized for my own experimentation needs etc ...). The kubernetes cluster is highly configurable and requires the following prerequisites:
+YaKEL (Yet Another Kubernetes Environment Lab) is an ansible lightweight playbook for fast installation (in less than 10 minutes) of a kubernetes lab of 3 hosts that can fit on your laptop, which I realized for my own experimentation needs etc ...). The kubernetes cluster is highly configurable and requires the following prerequisites:
 
  - [*] systeme d'exploitation: MacOS / Linux 
  - [*] virtualbox: 5.2.8
