@@ -23,19 +23,17 @@ endif::[]
 
 [Abstract]
 == Abstract
-
-Yakil ( Yet Another Kubernetes Environment Lab) est un projet ansible playbook léger pour l'installation rapide (en moins de 10 minutes) d'un lab kubernetes de 3 noeuds pouvant tenir sur un laptop, que j'ai réalisé pour mes propres besoins ( experimentation etc ...). Le cluster kubernetes est tres configurable et nécéssite les pre-requis suivant :
-
+Yakil (Yet Another Kubernetes Environment Lab) is an ansible lightweight playbook for fast installation (in less than 10 minutes) of a kubernetes lab of 3 hosts that can fit on your laptop, which I realized for my own experimentation needs etc ...). The kubernetes cluster is highly configurable and requires the following prerequisites:
 
  - [*] systeme d'exploitation: MacOS / Linux 
  - [*] virtualbox: 5.2.8
  - [*] Vagrant : 2.0.3
- - [*] Ansible : 2.5.0 sera installer de manière isolé en utilisant python virtualenv afin de ne pas perturbé votre version courante d'ansible si vous l'avez deja sur votre machine.
+ - [*] Ansible : 2.5.0 will be installed in isolation using python virtualenv so as not to disturb your current version of ansible if you already have one on your laptop
 
-L’élaboration de Yakel cluster est très largement inspiré du tutoriel « Kubernetes The Hard Way », de Kelsey Hightower ( developer advocate chez google) et dans une moindre mesure de coreos tectonic.
+The development of Yakel is largely inspired by "Kubernetes The Hard Way" tutorial, by Kelsey Hightower (developer advocate at google) and to a lesser extent tectonic coreos.
 
 
-A la fin de l'installation, 5 à 8 minutes selon votre connexion internet ou la capacité de votre laptop, nous obtiendrons le cluster tel que décrit sur le schéma ci-dessous 
+At the end of the installation, 5 to 8 minutes depending on your internet connection or the capacity of your laptop, we will get the cluster as described in the diagram below. 
 
 
      INSEREZ L'IMAGE DU CLUSTER ICI 
@@ -45,7 +43,7 @@ A la fin de l'installation, 5 à 8 minutes selon votre connexion internet ou la 
 
 == Hands-On :
 
-première étape, activé l'environement virtualenv et installation d'ansible. Pour ce faire, recuperer les sources depuis github à partir du présent repository tel que décrit ci-dessous.
+first step, enabled virtualenv & install ansible. To do this, retrieve the sources from this repository as described below.
 
 ==== setupEnv
 
@@ -61,7 +59,9 @@ $ source setenv.sh
 
 Le provisioning des trois noeuds du cluster, composé d'un master et deux workers, peut se faire en une seul étape, pour les impatients il suffit de lancer la commande vagrant habituelle. *_vagrant up_*
 
-Par soucis de clarté je vais décomposé les étapes en 3 commandes: 
+The provisioning of the three nodes cluster, consisting of a master and two workers, can be done in one step, for the impatient it is enough to launch the usual vagrant command. * _vagrant up_ *
+
+For the sake of clarity I am going to break down the steps into 3 commands:
 
 - clusterplan
 - clusterkube
@@ -69,7 +69,7 @@ Par soucis de clarté je vais décomposé les étapes en 3 commandes:
 
 ==== ClusterPlan
 
-Première étape provisioner les 3 noeuds et configurer le système centos 7
+First step provision the 3 nodes and configure the system centos 7
 
 [source, shell,linenums]
 ----
@@ -79,7 +79,7 @@ $ vagrant up --provision-with clusterplan
 
 ==== ClusterKube
 
-Deuxieme étape installation de kubernetes. Lancer la commande vagrant ci-dessous afin de déclancher l'execution du playbook ansible d'installation de kubernetes.
+Second step installation of kubernetes. Launch the vagrant command below in order to trigger the execution of the kubernetes installable playbook.
 
 .deploy kube
 [source, shell,linenums]
@@ -87,7 +87,7 @@ Deuxieme étape installation de kubernetes. Lancer la commande vagrant ci-dessou
 $ vagrant provision --provision-with clusterkube
 ----
 
-Si tous s'est bien déroulé vous devriez obtenir les fichiers supplémentaire ci-dessous surligner en rouge:
+If all went well you should get the extra files below highlight:
 
 [source, shell,linenums]
 ----
@@ -103,7 +103,7 @@ tree -L 1
 └── setenv.sh
 ----
 
-Vérifions que le cluster est operationel en tapant les commandes suivante:
+Let's check that the cluster is operational by typing the following commands
 
 .check clusterStatus
 [source, shell,linenums]
@@ -112,14 +112,14 @@ $ ./kubectl --kubeconfig kubectl.kubeconfig get cs <1>
 ----
 <1> Affiche le status du cluster, cs = componentstatuses
 
-TIP: Pro tip: exporter la variable d'environement "KUBECONFIG=kubectl.kubeconfig" dans votre shell permet d'eviter de repeter l'argument --kubeconfig a chaque commande
+TIP: Pro tip: exporting the environment variable "KUBECONFIG = kubectl.kubeconfig" in your shell avoids repeating the --kubeconfig argument for each command
 
-NOTE: Le saviez vous ? kubens est un outils vous permettant entre autre de switcher entre different namespace kubernetes sans avoir re-taper de longue commande à chaque fois. https://github.com/ahmetb/kubectx +
-Au lieu de: $ kubectl --namespace kube-system (pour chaque commande) +
-vous aurez: $ kubens kube-system (1 seule fois)
+NOTE: Did you know ? kubens is a tool that allows you to switch between different kubernetes namespace without having to re-type long command each time. https://github.com/ahmetb/kubectx +
+Instead of: $ kubectl --namespace kube-system (for each command) +
+you will have: $ kubens kube-system (1 time)
 
 
-vous devriez obtenir ceci:
+you should get this:
 
 [source, yaml]
 ----
@@ -129,7 +129,7 @@ controller-manager   Healthy   ok
 etcd-0               Healthy   {"health": "true"}
 ----
 
-En entrant la commande ci-dessous nous devrions obtenir 
+By typing the following we should get a reponse from kubernetes apiserver
 .check cluster-infos
 [source, shell,linenums]
 ----
@@ -145,7 +145,7 @@ $ ./kubectl --kubeconfig kubectl.kubeconfig cluster-infos <1>
 
 ==== ClusterApps
 
-Troisième étape, installation des apps kubernetes, ici traefik ( l'ingress controller) et le dashboard kubernetes sont les deux apps de base a déployer.
+Third step, installation of kubernetes apps, here traefik (ingress controller) and kubernetes dashboard are the two basic optionnal apps to deploy.
 
 .deploy apps
 [source, shell,linenums]
@@ -153,25 +153,24 @@ Troisième étape, installation des apps kubernetes, ici traefik ( l'ingress con
 $ vagrant provision --provision-with clusterapps
 ----
 
-Apres environs 1 à 2 minutes, vous pouvez acceder au interface web des kube apps :
+After about 1 to 2 minutes, you can access the kube apps web interface:
 
 - traefik: traefik.apps.roklab.ops 
 - dashboard: dashboard.apps.roklab.ops
 
 
-Ce qui nous donne pour dashboard.apps.roklab.ops  :
+dashboard.apps.roklab.ops  :
 
-INCLURE IMAGE DASHBOARD
+
 
 image::Kubedash.png[kubernetes dashboard]
 
 
-Ce qui nous donne pour traefik.apps.roklab.ops  :
+traefik.apps.roklab.ops  :
 
 
-INCLURE IMAGE TRAEFIK
 
 image::Traefikdash.png[Treafik admin ui]
 
 
-Apache 2 license
+The repository is license under Apache 2
