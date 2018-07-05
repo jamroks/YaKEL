@@ -37,7 +37,9 @@ At the end of the installation, 5 to 8 minutes depending on your internet connec
 
 
      INSEREZ L'IMAGE DU CLUSTER ICI 
-      
+    
+image::schemakube.png[schema]
+
       VAGRANT --> ANSIBLE --> KUBERNETES {  master et 2 worker }
 
 
