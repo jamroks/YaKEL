@@ -33,14 +33,9 @@ YaKEL (Yet Another Kubernetes Environment Lab) is an ansible lightweight playboo
 The development of Yakel is largely inspired from "Kubernetes The Hard Way" tutorial, by Kelsey Hightower (developer advocate at google) and to a lesser extent tectonic coreos.
 
 
-At the end of the installation, 5 to 8 minutes depending on your internet connection or the capacity of your laptop, we will get the cluster as described in the diagram below. 
-
-
-     INSEREZ L'IMAGE DU CLUSTER ICI 
+At the end of the installation, 5 to 8 minutes depending on your internet connection or the capacity of your laptop, we will get the cluster as described in the diagram below.
     
 image::schemakube.png[schema]
-
-      VAGRANT --> ANSIBLE --> KUBERNETES {  master et 2 worker }
 
 
 == Hands-On :
