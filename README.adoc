@@ -57,8 +57,6 @@ $ source setenv.sh
 
 === ClusterLaunch
 
-Le provisioning des trois noeuds du cluster, composé d'un master et deux workers, peut se faire en une seul étape, pour les impatients il suffit de lancer la commande vagrant habituelle. *_vagrant up_*
-
 The provisioning of the three nodes cluster, consisting of a master and two workers, can be done in one step, for the impatient it is enough to launch the usual vagrant command. * _vagrant up_ *
 
 For the sake of clarity I am going to break down the steps into 3 commands:
