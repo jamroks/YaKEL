@@ -30,7 +30,7 @@ YaKEL (Yet Another Kubernetes Environment Lab) is an ansible lightweight playboo
  - [*] Vagrant : 2.0.3
  - [*] Ansible : 2.5.0 will be installed in isolation using python virtualenv so as not to disturb your current version of ansible if you already have one on your laptop
 
-The development of Yakel is largely inspired by "Kubernetes The Hard Way" tutorial, by Kelsey Hightower (developer advocate at google) and to a lesser extent tectonic coreos.
+The development of Yakel is largely inspired from "Kubernetes The Hard Way" tutorial, by Kelsey Hightower (developer advocate at google) and to a lesser extent tectonic coreos.
 
 
 At the end of the installation, 5 to 8 minutes depending on your internet connection or the capacity of your laptop, we will get the cluster as described in the diagram below. 
