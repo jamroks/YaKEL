@@ -52,7 +52,7 @@ ingress:
       route: apps.kubelab.ops
       address: 192.168.32.8
       vagrant_enabled: false
-      nodename: node05
+      nodename: node02
 
 ### -- kubernetes / ansible extra vars / vagrant vmbox variables
 server:
@@ -74,16 +74,16 @@ server:
           ram: 2048
     worker:
         nodes:
-        - nodename: node05
-          fqdn: 'node05.kubelab.ops'
-          aliases: node05
+        - nodename: node02
+          fqdn: 'node02.kubelab.ops'
+          aliases: node02
           vagrant_enabled: true
           ip: 192.168.32.8
           cpu: 1
           ram: 1024
-        - nodename: node06
-          fqdn: 'node06.kubelab.ops'
-          aliases: node06
+        - nodename: node03
+          fqdn: 'node03.kubelab.ops'
+          aliases: node03
           vagrant_enabled: true
           ip: 192.168.32.9
           cpu: 1
@@ -107,20 +107,20 @@ provisioner:
 
 ### -- ansible groupvars & hostvars that get in the vagrant generated inventory --> (relative to Vagrantfile dir ) .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory
     ansible_groups: {
-        ROK8LABZ: ["wakanda", "node05", "node06"],
+        ROK8LABZ: ["wakanda", "node02", "node03"],
         'ROK8LABZ:children': ["cluster", "etcd", "storage", "ingress"],
         'ROK8LABZ:vars': { ansible_become: true, ansible_user: 'vagrant' },
         'cluster:children': ["controlplane", "worker"],
         'cluster:vars': { docker_version:  '18.03.0', authorization_modes: ['RBAC', 'Node'] },
         controlplane: ["wakanda"],
         'controlplane:vars': { secure_port: '6443', insecure_port: '8080' },
-        worker: ["node05", "node06"],
+        worker: ["node02", "node03"],
         etcd: ["wakanda"],
         storage: ["wakanda"],
-        ingress: ["node05"]
+        ingress: ["node02"]
     }
     ansible_host_vars: {
                 wakanda: { prefered_iface: '192.168.32.7', prefered_device: 'eth1'},
-                node05: { prefered_iface: '192.168.32.8', prefered_device: 'eth1'},        
-                node06: { prefered_iface: '192.168.32.9', prefered_device: 'eth1'}
+                node02: { prefered_iface: '192.168.32.8', prefered_device: 'eth1'},        
+                node03: { prefered_iface: '192.168.32.9', prefered_device: 'eth1'}
     }
