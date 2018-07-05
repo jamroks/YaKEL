@@ -108,7 +108,7 @@ Let's check that the cluster is operational by typing the following commands
 ----
 $ ./kubectl --kubeconfig kubectl.kubeconfig get cs <1>
 ----
-<1> Affiche le status du cluster, cs = componentstatuses
+<1> Display the cluster status, cs = componentstatuses
 
 TIP: Pro tip: exporting the environment variable "KUBECONFIG = kubectl.kubeconfig" in your shell avoids repeating the --kubeconfig argument for each command
 
@@ -127,7 +127,7 @@ controller-manager   Healthy   ok
 etcd-0               Healthy   {"health": "true"}
 ----
 
-By typing the following we should get a reponse from kubernetes apiserver
+By typing the following we should get a response from kubernetes apiserver
 .check cluster-infos
 [source, shell,linenums]
 ----
