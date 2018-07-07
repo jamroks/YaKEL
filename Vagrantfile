@@ -5,7 +5,7 @@ require 'yaml'
 ENV["LC_ALL"] = "en_US.UTF-8"
 #sync_type = 'nfs'
 VAGRANTFILE_API_VERSION = '2'
-#param = YAML::load(File.join(File.dirname(__FILE__), 'clustervars.yml'))
+
 param = YAML.load_file(File.join(File.dirname(__FILE__), 'clustervars.yml'))
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
