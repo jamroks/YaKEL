@@ -49,7 +49,7 @@ first step, enabled virtualenv & install ansible. To do this, retrieve the sourc
 ----
 $ git clone "https://github.com/jamroks/yakel.git"
 $ cd yakel
-$ source setenv.sh
+$ source setupenv.sh
 ----
 
 The provisioning of the three nodes cluster, consisting of a master and two workers, can be done in one step, for the impatient it is enough to launch the usual vagrant command. * _vagrant up_ *
