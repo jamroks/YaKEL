@@ -35,7 +35,7 @@ The development of Yakel is largely inspired from "Kubernetes The Hard Way" tuto
 
 At the end of the installation, 5 to 8 minutes depending on your internet connection or the capacity of your laptop, we will get the cluster as described in the diagram below.
     
-image::transparent/schemakube.png[schema]
+image::transparent/schemakube2.png[schema]
 
 
 == Hands-On :
