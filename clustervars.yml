@@ -58,16 +58,15 @@ ingress:
 server:
     etcd: ## etcd is for ansible only. etcd is on same vm as master
         nodes:
-        - nodename: wakanda
-          fqdn: 'wakanda.kubelab.ops'
+        - nodename: node01
+          fqdn: 'node01.kubelab.ops'
           vagrant_enabled: false # no need to create the vm, i just need it for host group logic in playbook
           ip: 192.168.32.7
     controlplane:
         nodes:
-        - nodename: wakanda
-          fqdn: 'wakanda.kubelab.ops'
-          #ingress: apps.kubelab.ops # for web browser facing application
-          aliases: 'wakanda'
+        - nodename: node01
+          fqdn: 'node01.kubelab.ops'
+          aliases: 'node01'
           vagrant_enabled: true
           ip: 192.168.32.7
           cpu: 2
@@ -107,20 +106,20 @@ provisioner:
 
 ### -- ansible groupvars & hostvars that get in the vagrant generated inventory --> (relative to Vagrantfile dir ) .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory
     ansible_groups: {
-        ROK8LABZ: ["wakanda", "node02", "node03"],
+        ROK8LABZ: ["node01", "node02", "node03"],
         'ROK8LABZ:children': ["cluster", "etcd", "storage", "ingress"],
         'ROK8LABZ:vars': { ansible_become: true, ansible_user: 'vagrant' },
         'cluster:children': ["controlplane", "worker"],
         'cluster:vars': { docker_version:  '18.03.0', authorization_modes: ['RBAC', 'Node'] },
-        controlplane: ["wakanda"],
+        controlplane: ["node01"],
         'controlplane:vars': { secure_port: '6443', insecure_port: '8080' },
         worker: ["node02", "node03"],
-        etcd: ["wakanda"],
-        storage: ["wakanda"],
+        etcd: ["node01"],
+        storage: ["node01"],
         ingress: ["node02"]
     }
     ansible_host_vars: {
-                wakanda: { prefered_iface: '192.168.32.7', prefered_device: 'eth1'},
+                node01: { prefered_iface: '192.168.32.7', prefered_device: 'eth1'},
                 node02: { prefered_iface: '192.168.32.8', prefered_device: 'eth1'},        
                 node03: { prefered_iface: '192.168.32.9', prefered_device: 'eth1'}
     }
