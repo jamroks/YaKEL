@@ -93,7 +93,7 @@ tree -L 1
 ├── "*kubectl.kubeconfig*"
 ├── provisioning
 ├── requirements.txt
-└── setenv.sh
+└── setupenv.sh
 ----
 
 Let's check that the cluster is operational by typing the following commands
