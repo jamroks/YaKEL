@@ -64,9 +64,9 @@ server:
           ip: 192.168.32.7
     controlplane:
         nodes:
-        - nodename: wakanda
-          fqdn: wakanda.kubelab.ops
-          aliases: wakanda
+        - nodename: node01
+          fqdn: node1.kubelab.ops
+          aliases: node01
           vagrant_enabled: true
           ip: 192.168.32.7
           cpu: 2
