@@ -2,7 +2,7 @@
 
   #### -- vagrant vbox variables
 vagrant:
-  domain_tld: "kubelab.ops"
+  domain_tld: 'kubelab.ops'
   box: "centos/7" 
   vbox_guest_version: '5.2.8'
   timezone: "Europe/Paris"
@@ -25,7 +25,7 @@ vagrant:
     private_ip_disabled: false
   landrush:
     enabled: true
-    tld: 'kubelab.ops'
+    tld: kubelab.ops
     interface: 'eth1'
     class: 'ipv4'
     redirect_guest: false
@@ -64,9 +64,9 @@ server:
           ip: 192.168.32.7
     controlplane:
         nodes:
-        - nodename: node01
-          fqdn: 'node01.kubelab.ops'
-          aliases: 'node01'
+        - nodename: wakanda
+          fqdn: wakanda.kubelab.ops
+          aliases: wakanda
           vagrant_enabled: true
           ip: 192.168.32.7
           cpu: 2
@@ -81,7 +81,7 @@ server:
           cpu: 1
           ram: 1024
         - nodename: node03
-          fqdn: 'node03.kubelab.ops'
+          fqdn: node03.kubelab.ops
           aliases: node03
           vagrant_enabled: true
           ip: 192.168.32.9
