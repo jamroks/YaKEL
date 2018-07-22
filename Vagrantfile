@@ -112,6 +112,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     trigger.name = "Cleanup generated ressources"
     trigger.ignore = [:up, :halt, :resume, :provision, :reload]
     trigger.info = "Deleting resource folder ./provisioning/pki"
-    trigger.run  = {inline: "rm -rf ./provisioning/pki && rm ./kubectl ./kubeconfig.kubectl"}
+    trigger.run  = {inline: "rm -rf ./provisioning/pki && rm ./kubectl ./kubectl.kubeconfig"}
   end
 end
