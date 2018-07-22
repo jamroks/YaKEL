@@ -2,7 +2,7 @@
 
   #### -- vagrant vbox variables
 vagrant:
-  domain_tld: 'kubelab.ops'
+  domain_tld: 'roklab.ops'
   box: "centos/7" 
   vbox_guest_version: '5.2.8'
   timezone: "Europe/Paris"
@@ -25,7 +25,7 @@ vagrant:
     private_ip_disabled: false
   landrush:
     enabled: true
-    tld: kubelab.ops
+    tld: roklab.ops
     interface: 'eth1'
     class: 'ipv4'
     redirect_guest: false
@@ -49,7 +49,7 @@ cluster:
 ### -- kubernetes / ansible extra vars  
 ingress:
     edge:
-      route: apps.kubelab.ops
+      route: apps.roklab.ops
       address: 192.168.32.8
       vagrant_enabled: false
       nodename: node02
@@ -67,13 +67,13 @@ server:
     etcd: ## etcd is for ansible only. etcd is on same vm as master
         nodes:
         - nodename: node01
-          fqdn: 'node01.kubelab.ops'
+          fqdn: 'node01.roklab.ops'
           vagrant_enabled: false # no need to create the vm, i just need it for host group logic in playbook
           ip: 192.168.32.7
     controlplane:
         nodes:
         - nodename: node01
-          fqdn: node1.kubelab.ops
+          fqdn: node1.roklab.ops
           aliases: node01
           vagrant_enabled: true
           ip: 192.168.32.7
@@ -82,14 +82,14 @@ server:
     worker:
         nodes:
         - nodename: node02
-          fqdn: 'node02.kubelab.ops'
+          fqdn: 'node02.roklab.ops'
           aliases: node02
           vagrant_enabled: true
           ip: 192.168.32.8
           cpu: 1
           ram: 1024
         - nodename: node03
-          fqdn: node03.kubelab.ops
+          fqdn: node03.roklab.ops
           aliases: node03
           vagrant_enabled: true
           ip: 192.168.32.9
