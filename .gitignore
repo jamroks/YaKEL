@@ -1,6 +1,6 @@
-	.vagrant/
-	ansible-2.5.4/
-	kubectl
-	kubectl.kubeconfig
-	provisioning/mitogen-master/
-	provisioning/pki/
+.vagrant/
+ansible-2.5.4/
+kubectl
+kubectl.kubeconfig
+provisioning/mitogen-master/
+provisioning/pki/
