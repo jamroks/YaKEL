@@ -47,8 +47,8 @@ first step, enabled virtualenv & install ansible. To do this, retrieve the sourc
 .git clone & source virtualenv
 [source, shell,linenums]
 ----
-$ git clone "https://github.com/jamroks/yakel.git"
-$ cd yakel
+$ git clone "https://github.com/jamroks/YaKEL.git"
+$ cd YaKEL
 $ source setupenv.sh
 ----
 
