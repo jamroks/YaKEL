@@ -5,7 +5,7 @@ kubelet_schedulable: '{% if "worker" in group_names %}true{% else %}false{% endi
 kubelet_master_only: '{% if inventory_hostname in groups["controlplane"] and inventory_hostname not in groups["worker"] %}true{% else %}false{% endif %}'
 
 kubelet_overrides:
-    'fail-swap-on': 'false'
+    'fail-swap-on': 'true'
 
 kubelet_opts:
   'allow-privileged': 'true'
@@ -24,9 +24,9 @@ kubelet_opts:
   'alsologtostderr': 'true'
   'fail-swap-on': 'false'
   'kubeconfig': '{{ kube_config.kubelet }}'
-  'node-labels': '{%  if "controlplane" in group_names %},node-role.kubernetes.io/master=
-                  {%-   if not kubelet_master_only|bool %},node-role.kubernetes.io/node={% endif %}
-                  {%- else %}node-role.kubernetes.io/node=
+  'node-labels': '{%  if "controlplane" in group_names %},node-role.kubernetes.io/master
+                  {%-   if not kubelet_master_only|bool %},node-role.kubernetes.io/node{% endif %}
+                  {%- else %}node-role.kubernetes.io/node
                   {%- endif %}'
   'node-ip': '{{ prefered_iface }}'
   'pod-infra-container-image': '{{ images.pause.name }}:{{ images.pause.version }}'

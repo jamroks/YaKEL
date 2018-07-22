@@ -2,16 +2,11 @@
 
 etcd_version: 'v3.2.11'
 kube_version: "{{ cluster.kubernetes_version | default('v1.10.0') }}"
-helm_version: 'helm-v2.8.0'
-istio_version: '0.7.1'
 
 platform_arch: "{{ (ansible_architecture == 'armv6l') | ternary('aarch','amd64') }}"
 kube_mirror_url: 'https://storage.googleapis.com/kubernetes-release/release'
 etcd_mirror_url: 'https://storage.googleapis.com/etcd'
 istio_mirror_url: 'https://storage.googleapis.com/istio-release/releases'
-
-helm_mirror_url: 'https://storage.googleapis.com/kubernetes-helm'
-helm_pkg_sha256sum: "{% if ansible_system == 'Darwin' %}{{ sha256_darwin }}{% else %}{{ sha256_linux }}{% endif %}"
 
 etcd_cluster_list: "https://{{ server.etcd.nodes[0].nodename }}:2379"
 kube_master_apiserver_count: "{{ groups['controlplane'] | length }}"
@@ -89,7 +84,3 @@ images:
     traefik:
         name: traefik
         version: v1.6-alpine
-
-    haproxy:
-       name: quay.io/jcmoraisjr/haproxy-ingress
-       version: v0.5-beta.1

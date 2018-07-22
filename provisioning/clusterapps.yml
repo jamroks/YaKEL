@@ -17,6 +17,7 @@
     import_role:
         name: rok.kube-apps/heapster
         tasks_from: heapStart
+    when: apps.dashboard.enabled |default(false) | bool == true
 
 
   - name: start <Role> | Deploy Dashboard
@@ -24,13 +25,19 @@
     import_role:
         name: rok.kube-apps/dashboard
         tasks_from: kubeDash
+    when: apps.dashboard.enabled |default(false) | bool == true
 
   - name: Deploy Traefik Ingress Controler
     tags: ['traefik']
     import_role:
          name: rok.kube-apps/traefik
+    when: apps.traefik.enabled |default(true) | bool == true
 
-
+  # - name: Deploy Spinnaker Continuous Delivery Platform
+  #   tags: ['traefik']
+  #   import_role:
+  #        name: rok.kube-apps/spinnaker
+  #   when: kubeapps.spinnaker.enabled |default(false) | bool == true
 
 # spinnaker.apps.roklab.ops
 # dashboard.apps.roklab.ops
