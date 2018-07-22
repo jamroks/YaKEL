@@ -40,7 +40,7 @@ vagrant:
 cluster:
     name: "local"
     domain: "cluster.local"
-    kubernetes_version: 'v1.10.0'
+    kubernetes_version: 'v1.11.1'
     networking:
           pod_cidr_address: "172.16.0.0/16"
           service_cidr_address: "172.20.0.0/16"
@@ -53,6 +53,15 @@ ingress:
       address: 192.168.32.8
       vagrant_enabled: false
       nodename: node02
+
+kubeapps: 
+    dashboard:
+      enbaled: false
+    traefik: 
+      enaled: true
+    spinnaker: 
+      enabled: true
+    
 
 ### -- kubernetes / ansible extra vars / vagrant vmbox variables
 server:
