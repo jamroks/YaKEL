@@ -61,7 +61,6 @@ apps:
       enaled: true
     spinnaker:
       enabled: true
-    
 
 ### -- kubernetes / ansible extra vars / vagrant vmbox variables
 server:
