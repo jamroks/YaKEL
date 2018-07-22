@@ -53,7 +53,13 @@ ingress:
       address: 192.168.32.8
       vagrant_enabled: false
       nodename: node02
-
+apps:
+  dashboard:
+    enabled: false
+  traefik:
+    enabled: true
+  spinnaker:
+    enabled: true
 ### -- kubernetes / ansible extra vars / vagrant vmbox variables
 server:
     etcd: ## etcd is for ansible only. etcd is on same vm as master
