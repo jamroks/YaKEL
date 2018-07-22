@@ -54,12 +54,12 @@ ingress:
       vagrant_enabled: false
       nodename: node02
 
-kubeapps: 
+apps:
     dashboard:
       enbaled: false
-    traefik: 
+    traefik:
       enaled: true
-    spinnaker: 
+    spinnaker:
       enabled: true
     
 
