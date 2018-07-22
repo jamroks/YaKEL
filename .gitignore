@@ -1,0 +1,8 @@
+kubectl
+kubectl.kubeconfig
+provisioning/mitogen-master
+provisioning/pki
+readme.txt
+ansible-2.5.4
+.DS_Store
+.vagrant/
