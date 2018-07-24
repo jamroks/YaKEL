@@ -56,11 +56,11 @@ ingress:
 
 apps:
     dashboard:
-      enbaled: false
+      enbaled: true
     traefik:
       enaled: true
     spinnaker:
-      enabled: true
+      enabled: false
 
 ### -- kubernetes / ansible extra vars / vagrant vmbox variables
 server:
