@@ -1,0 +1,23 @@
+---
+# Download assets to the local workstations persistent download cache directory
+- name: lib.wget
+  become: "{{ local_become_enable|default(omit) }}"
+  become_user: "{{ local_become_user|default(omit) }}"
+  become_method: "{{ local_become_method|default(omit) }}"
+  run_once: true
+  no_log: "{{ true if no_log is defined else omit }}"
+  local_action: get_url
+  args:
+    url: "{{ url|mandatory }}"
+    dest: "{{ local_data_cache }}/{{ filename|mandatory }}"
+    url_username: "{{ url_username|default(omit) }}"
+    url_password: "{{ url_password|default(omit) }}"
+    checksum: "{{ checksum|default(omit) }}"
+    sha256sum: "{{ sha256sum|default(omit) }}"
+    force: "{{ force|default(false)|bool }}"
+    timeout: "{{ timeout|default(get_url_timeout) }}"
+    use_proxy: "{{ use_proxy|default(true)|bool }}"
+    validate_certs: "{{ validate_certs|default(true)|bool }}"
+    mode: "{{ mode|default(0644) }}"
+    owner: "{{ local_data_owner|default(omit) }}"
+    group: "{{ local_data_group|default(omit) }}"

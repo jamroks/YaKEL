@@ -56,7 +56,7 @@ ingress:
 
 apps:
     dashboard:
-      enbaled: true
+      enbaled: false
     traefik:
       enaled: true
     spinnaker:
@@ -118,7 +118,10 @@ provisioner:
         'ROK8LABZ:children': ["cluster", "etcd", "storage", "ingress"],
         'ROK8LABZ:vars': { ansible_become: true, ansible_user: 'vagrant' },
         'cluster:children': ["controlplane", "worker"],
-        'cluster:vars': { docker_version:  '18.03.0', authorization_modes: ['RBAC', 'Node'] },
+        'cluster:vars': { docker_version:  '18.03.0', authorization_modes: ['RBAC', 'Node'],
+                          local_data_cache: "{{ playbook_dir }}/.ansible/assets",
+                          remote_data_cache: "/usr/local/src/ansible/data"
+                         },
         controlplane: ["node01"],
         'controlplane:vars': { secure_port: '6443', insecure_port: '8080' },
         worker: ["node02", "node03"],

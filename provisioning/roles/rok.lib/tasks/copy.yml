@@ -1,0 +1,14 @@
+---
+
+- name: lib.copy <{{ filename }}>
+  become: no
+  copy:
+    src: "{{ local_data_cache }}/{{ filename|mandatory }}"
+    dest: "{{ destdir | default(remote_data_cache) }}/{{ filename|mandatory }}"
+    backup: "{{ backup|default(false)|bool }}"
+    follow: "{{ follow|default(false)|bool }}"
+    force: "{{ force|default(true)|bool }}"
+    validate: "{{ validate|default(omit) }}"
+    mode: "{{ mode|default(0644) }}"
+    owner: "{{ remote_data_owner|default(omit) }}"
+    group: "{{ remote_data_owner|default(omit) }}"

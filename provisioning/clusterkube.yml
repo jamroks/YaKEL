@@ -70,6 +70,8 @@
         until: result is succeeded
         retries: 2
         delay: 1
+
+
   tasks:
 
   - name: start <role> | call etcd
@@ -109,17 +111,46 @@
   environment:
     KUBECONFIG: "{{ kube_config.kubectl }}"
   pre_tasks:
+      # - name: "download kube node binaries"
+      #   tags: ['kubelet', 'kube-proxy', 'docker']
+      #   get_url:
+      #       url: "{{ binary.kube.mirror_url }}/{{ item }}"
+      #       dest: /usr/bin/{{ item }}
+      #       mode: 0755
+      #   with_items: "{{ binary.kube.component.node }}"
+      #   register: result
+      #   until: result is succeeded
+      #   retries: 2
+      #   delay: 1
+
+      - name:  local & remote perisistence  directory
+        include_role:
+           name: rok.lib
+           tasks_from: cachedir
+
       - name: "download kube node binaries"
         tags: ['kubelet', 'kube-proxy', 'docker']
-        get_url:
-            url: "{{ binary.kube.mirror_url }}/{{ item }}"
-            dest: /usr/bin/{{ item }}
-            mode: 0755
+        include_role:
+           name: rok.lib
+           tasks_from: wget
         with_items: "{{ binary.kube.component.node }}"
+        vars:
+           url: "{{ binary.kube.mirror_url }}/{{ item }}"
+           filename: "{{ item }}"
         register: result
         until: result is succeeded
         retries: 2
         delay: 1
+      
+      - name: deploy node binaries to remote server
+        include_role:
+           name: rok.lib
+           tasks_from: copy
+        with_items: "{{ binary.kube.component.node }}"
+        vars:
+           filename: "{{ item }}"
+           destdir: "/usr/bin"
+           mode: "0755"
 
   tasks:
 
@@ -174,7 +205,7 @@
 ## Service Discovery: with CoreDNS instead of the default kube-dns
 - hosts: controlplane
   any_errors_fatal: true
-  name: Start <Play> CoreDNS Deployment  
+  name: Start <Play> CoreDNS Deployment
   tags: ['dns']
   become: yes
   environment:
@@ -184,5 +215,5 @@
   - name: start <role> | call coreDNS
     tags: ['coredns']
     import_role:
-        name: rok.kube-apps/coredns
+        name: rok.kube-network/coredns
         tasks_from: coreDNS

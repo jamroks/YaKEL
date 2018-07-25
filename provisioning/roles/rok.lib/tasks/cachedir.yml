@@ -1,0 +1,14 @@
+---
+- name: create local persistent data cache
+  become: no
+  run_once: true
+  local_action: file
+  args:
+    state: directory
+    path: "{{ local_data_cache }}"
+ 
+
+- name: create remote persistent data cache
+  file:
+    state: directory
+    path: "{{ remote_data_cache }}"
