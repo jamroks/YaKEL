@@ -25,15 +25,31 @@ image::kubernetes.png[kubernetes]
 YaKEL (Yet Another Kubernetes Environment Lab) is an ansible lightweight playbook for fast installation (in less than 10 minutes) of a kubernetes lab of 3 hosts that can fit on your laptop, which I build for my own experimentation needs. The kubernetes cluster is highly configurable and requires the following prerequisites:
 
  - [*] systeme d'exploitation: MacOS / Linux 
- - [*] virtualbox: 5.2.8
- - [*] Vagrant : 2.0.3
- - [*] Ansible : 2.5.0 will be installed in isolation using python virtualenv so as not to disturb your current version of ansible if you already have one on your laptop
+ - [*] https://www.virtualbox.org[virtualbox]: 5.2.8
+ - [*] https://www.vagrantup.com[Vagrant] : 2.0.3
+ - [*] https://docs.ansible.com/ansible/latest/index.html[Ansible] : 2.5.4
+ 
+Ansible will be installed in isolation using python virtualenv so as not to disturb your current version of ansible if you already have one on your laptop
+
 
 The development of Yakel is largely inspired from "Kubernetes The Hard Way" tutorial, by Kelsey Hightower (developer advocate at google) and to a lesser extent tectonic coreos.
 
 
 At the end of the installation, 5 to 8 minutes depending on your internet connection or the capacity of your laptop, we will get the cluster as described in the diagram below.
-    
+
+YaKEL is made up the following component:
+
+ - [*] https://kubernetes.io[Kubernetes] : 1.11.1
+ - [*] https://www.projectcalico.org[Calico] : 3.1
+ - [*] https://coredns.io[CoreDNS] : 1.2
+ - [*] https://coreos.com/etcd/[etcd] : 3.2.11
+ - [*] https://www.centos.org[CentOS] : 7.4
+
+NOTE: Here is the infos to access to ui and dashboard respectively for traefik and kubernetes +
+      *Traefik* will be available locally at: *traefik.apps.roklab.ops* +
+      *Kubernetes*  will be available locally at: *dashboard.apps.roklab.ops*
+
+
 image::transparent/schemakube2.png[schema]
 
 
@@ -67,6 +83,14 @@ First step provision the 3 nodes and configure the system centos 7
 ----
 $ vagrant up --provision-with clusterplan
 ----
+
+You may see the message below appearing in the standard out when vagrant is doing its thing or booting up, but no worries, after a few attempt it will connect succesfully ! 
+
+    node02: SSH address: 127.0.0.1:2222
+    node02: SSH username: vagrant
+    node02: SSH auth method: private key
+    node02: Warning: Connection reset. Retrying...
+    node02: Warning: Remote connection disconnect. Retrying...
 
 
 ==== ClusterKube
