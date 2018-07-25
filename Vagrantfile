@@ -55,9 +55,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       controla.vm.box      = param['vagrant']['box']
       controla.vm.hostname = node_id['fqdn']
       controla.vm.network :private_network, ip: node_id['ip']
-      #controla.landrush.host node_id['ingress'], node_id['ip']
-      # adding it, cause i'm changing the hostname inside the playbook
-      #controla.landrush.host node_id['fqdn'], node_id['ip']
       controla.hostmanager.aliases = node_id['aliases']
       controla.vm.provider :virtualbox do |vb|
         vb.gui = param['vagrant']['gui']['enbaled']
@@ -104,14 +101,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         ansible.tags                   = param['provisioner']['tags']['apps']
         ansible.playbook               = param['provisioner']['play']['clusterapps']
         ansible.extra_vars             = param['provisioner']['extra_vars']
+
+        config.trigger.after :destroy do |trigger|
+          trigger.name = "Cleanup generated ressources"
+          trigger.ignore = [:up, :halt, :resume, :provision, :reload]
+          trigger.info = "Deleting resource folder ./provisioning/pki"
+          trigger.run  = {inline: "rm -rf ./provisioning/pki && rm -rf ./provisioning/.ansible && rm ./kubectl ./kubectl.kubeconfig"}
+        end
       end
     end
   end
 
-  config.trigger.after :destroy do |trigger|
-    trigger.name = "Cleanup generated ressources"
-    trigger.ignore = [:up, :halt, :resume, :provision, :reload]
-    trigger.info = "Deleting resource folder ./provisioning/pki"
-    trigger.run  = {inline: "rm -rf ./provisioning/pki && rm ./kubectl ./kubectl.kubeconfig"}
-  end
+  
 end
