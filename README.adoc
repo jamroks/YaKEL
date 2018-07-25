@@ -163,6 +163,16 @@ $ ./kubectl --kubeconfig kubectl.kubeconfig cluster-infos <1>
 ==== ClusterApps
 
 Third step, installation of kubernetes apps, here traefik (ingress controller) and kubernetes dashboard are the two basic optionnal apps to deploy.
+By default dashboard will not be installed, only traefik proxy and ui will be installed. You can if you so wish install kubernetes dashboard by editing clustervars.yml and enabling the dashboard like describe below 
+
+[source, yaml,linenums]
+----
+apps:
+    dashboard:
+      enbaled: false
+----
+Now just just deploy apps by launching below command 
+
 
 .deploy apps
 [source, shell,linenums]
