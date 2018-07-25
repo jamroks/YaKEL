@@ -1,7 +1,8 @@
 kubectl
 kubectl.kubeconfig
-provisioning/mitogen-master
+provisioning/mitogen
 provisioning/pki
+provisioning/.ansible
 readme.txt
 ansible-*
 .DS_Store
