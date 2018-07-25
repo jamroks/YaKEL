@@ -24,7 +24,7 @@ image::kubernetes.png[kubernetes]
 == Abstract
 YaKEL (Yet Another Kubernetes Environment Lab) is an ansible lightweight playbook for fast installation (in less than 10 minutes) of a kubernetes lab of 3 hosts that can fit on your laptop, which I build for my own experimentation needs. The kubernetes cluster is highly configurable and requires the following prerequisites:
 
- - [*] systeme d'exploitation: MacOS / Linux 
+ - [*] operating system: MacOS / Linux 
  - [*] https://www.virtualbox.org[virtualbox]: 5.2.8
  - [*] https://www.vagrantup.com[Vagrant] : 2.0.3
  - [*] https://docs.ansible.com/ansible/latest/index.html[Ansible] : 2.5.4
