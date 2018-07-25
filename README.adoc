@@ -43,6 +43,7 @@ YaKEL is made up the following component:
  - [*] https://www.projectcalico.org[Calico] : 3.1
  - [*] https://coredns.io[CoreDNS] : 1.2
  - [*] https://coreos.com/etcd/[etcd] : 3.2.11
+ - [*] https://www.docker.com[docker] : 18.03.0
  - [*] https://www.centos.org[CentOS] : 7.4
 
 NOTE: Here is the infos to access to ui and dashboard respectively for traefik and kubernetes +
