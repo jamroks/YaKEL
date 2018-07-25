@@ -20,6 +20,7 @@
         msg: 'The playbook can only be run on Linux or Mac OSX systems'
       run_once: yes
       delegate_to: localhost
+
   tasks:
   - name: start <role> | call setup-os
     import_role:

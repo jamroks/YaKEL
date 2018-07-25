@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
 set +x
-
-export ANSIBLE_VERSION="2.5.4"
+# 2.5.4
+export ANSIBLE_VERSION="2.6.1"
 export ANSIBLE_PATH=ansible-${ANSIBLE_VERSION}
-
+export MITOGEN_VERSION="0.2.1"
+export MITOGEN_URL="https://files.pythonhosted.org/packages/source/m/mitogen/mitogen-${MITOGEN_VERSION}.tar.gz"
+export MITOGEN_POOL_SIZE=50
 dependencies() {
     easy_install --user pip
     pip install --user virtualenv
 }
 
 check(){
-    [ ! -d "ansible-${ANSIBLE_VERSION}" ]
+    [ ! -d "${ANSIBLE_PATH}" ]
 }
 
 activate() {
@@ -27,7 +29,8 @@ Ansible() {
     pip install -r requirements.txt
 }
 mitogen() {
-    curl -L https://github.com/dw/mitogen/archive/master.zip | tar -xzv -C provisioning
+    curl -L ${MITOGEN_URL} | tar -xzv -C provisioning
+    mv provisioning/mitogen-${MITOGEN_VERSION}  provisioning/mitogen
 }
 main() {
     vagrantPlugin

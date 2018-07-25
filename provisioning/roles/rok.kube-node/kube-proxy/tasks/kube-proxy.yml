@@ -5,24 +5,6 @@
       path: "/etc/kubernetes/specs"
       state: directory
   
-  # - name: Copy kube-proxy.yml to remote
-  #   template:
-  #     src: kube-proxy-rbac.yml
-  #     dest: "/etc/kubernetes/specs/kube-proxy-rbac.yml"
-  #     owner: root
-  #     group: root
-  #     mode: 0664
-
-  # - name: Deploy kube-proxy rbac Manifest
-  #   command: kubectl apply -f /etc/kubernetes/specs/kube-proxy-rbac.yml --kubeconfig /root/.kube/config
-  #   run_once: true
-
-  # - name: import kube-proxy account kubeconfig
-  #   import_tasks: account-config.yml
-
-  # - name: Label nodes for kube-proxy
-  #   command: kubectl label --overwrite nodes --selector kubernetes.io/hostname={{ inventory_hostname|lower }} --kubeconfig /root/.kube/config roklab/kube-proxy=true
-
   - name: copy kube-proxy kubeconfig
     template:
       src: kube-proxy.kubeconfig.j2
@@ -50,12 +32,3 @@
     until: running is success
     retries: 3
     delay: 5
-
-  
-
-  # sudo journalctl -fu kubelet 
-  # sudo journalctl -fu kube-proxy 
-
-  # docker ps 
-
-  # docker logs -f 

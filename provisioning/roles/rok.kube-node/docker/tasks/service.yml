@@ -7,4 +7,4 @@
   systemd:
     name: "{{ docker_service_name }}"
     state: started
-    enabled: "{{ docker_service_enable }}"
+    enabled: true

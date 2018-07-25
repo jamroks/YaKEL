@@ -1,3 +1,0 @@
-https://github.com/kubernetes/kops/blob/98b2437bc001907da8d4632b8476d7865f797eb1/upup/models/cloudup/resources/addons/networking.kuberouter/k8s-1.6.yaml.template
-https://github.com/cloudnativelabs/kube-router/issues/168
-https://github.com/murali-reddy/kube-router/blob/hostport/daemonset/kubeadm-kuberouter-all-features-hostport.yaml

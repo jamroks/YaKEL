@@ -27,7 +27,3 @@
   - name: manage selinux
     import_tasks: selinux.yml
     tags: ['selinux']
-
-  # - name: manage vbox guest addition
-  #   import_tasks: vbox.yml
-  #   tags: ['vbox']
