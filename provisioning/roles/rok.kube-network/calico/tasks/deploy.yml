@@ -20,9 +20,12 @@
     with_items:
       - { name: calico-rbac.yml, dest: '{{ calico_dir }}/calico-rbac.yml' }
 
-
   - name: Calico | create calico RBAC roles
-    command: kubectl apply -f /etc/calico/calico-rbac.yml --kubeconfig "{{ kube_config.kubectl }}"
+    k8s:
+      state: present
+      src: /etc/calico/calico-rbac.yml
+      kubeconfig: "{{ kube_config.kubectl }}"
+
 
   - name: Calico | copy calico deployments manifests to specs dir
     template:
@@ -36,7 +39,9 @@
         - { name: calico.yml,               dest: '{{ calico_dir }}/calico.yml' }
     register: calico_node_manifests
 
-
   - name: Calico | start calico containers
-    command: kubectl apply -f /etc/calico/calico.yml --kubeconfig "{{ kube_config.kubectl }}"
+    k8s:
+      state: present
+      src: /etc/calico/calico.yml
+      kubeconfig: "{{ kube_config.kubectl }}"
     notify: CalicoHandlers | Verify

@@ -1,0 +1,21 @@
+---
+
+  - name: create |  specs directory
+    file:
+      path: /etc/kubernetes/specs
+      state: directory
+
+  - name: copy | coreDNS manifest
+    template:
+      src: coredns.yml.j2
+      dest: "/etc/kubernetes/specs/coredns.yml"
+
+  - name: Start coreDNS service
+    k8s:
+      state: present
+      src: /etc/kubernetes/specs/coredns.yml
+      kubeconfig: "{{ kube_config.kubectl }}"
+    notify: CoreDnsHandlers | Verify
+
+  - name: trigger handlers now as we need it
+    meta: flush_handlers

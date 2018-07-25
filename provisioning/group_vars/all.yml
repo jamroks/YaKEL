@@ -71,7 +71,7 @@ images:
     
     coredns:
        name: coredns/coredns
-       version: 1.1.0
+       version: 1.2.0
 
     heapster:
        name: gcr.io/google_containers/heapster-amd64

@@ -63,5 +63,18 @@
         - lsof
         - nc
     notify: Restart network
-  
+
+  - name: Download pip installation script
+    get_url:
+        dest: /tmp
+        url: https://bootstrap.pypa.io/get-pip.py
+    
+  - name: Install pip
+    shell: python /tmp/get-pip.py
+
+  - name: Install kubernetes ansible module dependency
+    pip:
+      name: openshift
+      state: present
+ 
   - meta: flush_handlers

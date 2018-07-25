@@ -1,15 +1,5 @@
 ---
 
-#- name: Install Official Docker Repo
-#  yum_repository:
-#    name: docker
-#    description: Docker-ce Repository
-#    baseurl: "https://download.docker.com/linux/centos/docker-ce.repo"
-#    gpgkey: https://download.docker.com/linux/centos/gpg
-#    gpgcheck: yes
-#  when: docker_repo_enabled
-
-
 - name: Add Docker GPG key.
   rpm_key:
     key: https://download.docker.com/linux/centos/gpg
