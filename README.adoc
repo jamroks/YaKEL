@@ -129,7 +129,7 @@ $ ./kubectl --kubeconfig kubectl.kubeconfig get cs <1>
 ----
 <1> Display the cluster status, cs = componentstatuses
 
-TIP: Pro tip: exporting the environment variable "KUBECONFIG = kubectl.kubeconfig" in your shell avoids repeating the --kubeconfig argument for each command
+TIP: Pro tip: exporting the environment variable "KUBECONFIG=kubectl.kubeconfig" in your shell avoids repeating the --kubeconfig argument for each command
 
 NOTE: Did you know ? kubens is a tool that allows you to switch between different kubernetes namespace without having to re-type long command each time. https://github.com/ahmetb/kubectx +
 Instead of: $ kubectl --namespace kube-system (for each command) +
@@ -169,9 +169,9 @@ By default dashboard will not be installed, only traefik proxy and ui will be in
 ----
 apps:
     dashboard:
-      enbaled: false
+      enbaled: true
 ----
-Now just just deploy apps by launching below command 
+Now just deploy apps by launching below command 
 
 
 .deploy apps
@@ -180,7 +180,7 @@ Now just just deploy apps by launching below command
 $ vagrant provision --provision-with clusterapps
 ----
 
-After about 1 to 2 minutes, you can access the kube apps web interface:
+After about 1 minutes, you can access the kube apps web interface:
 
 - traefik: traefik.apps.roklab.ops 
 - dashboard: dashboard.apps.roklab.ops
