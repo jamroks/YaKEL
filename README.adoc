@@ -169,7 +169,7 @@ By default dashboard will not be installed, only traefik proxy and ui will be in
 ----
 apps:
     dashboard:
-      enbaled: true
+      enabled: true
 ----
 Now just deploy apps by launching below command 
 
