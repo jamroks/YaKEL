@@ -111,18 +111,6 @@
   environment:
     KUBECONFIG: "{{ kube_config.kubectl }}"
   pre_tasks:
-      # - name: "download kube node binaries"
-      #   tags: ['kubelet', 'kube-proxy', 'docker']
-      #   get_url:
-      #       url: "{{ binary.kube.mirror_url }}/{{ item }}"
-      #       dest: /usr/bin/{{ item }}
-      #       mode: 0755
-      #   with_items: "{{ binary.kube.component.node }}"
-      #   register: result
-      #   until: result is succeeded
-      #   retries: 2
-      #   delay: 1
-
       - name:  local & remote perisistence  directory
         include_role:
            name: rok.lib
