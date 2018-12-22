@@ -10,6 +10,7 @@
     - cfssl
 
 - name: Download statically linked cfssl binary
+  become: yes
   get_url:
     url: https://pkg.cfssl.org/{{cfssl_version}}/cfssl_{{ ansible_system | lower }}-amd64
     dest: "{{cfssl_bin_directory}}/cfssl"
@@ -31,6 +32,7 @@
 
 
 - name: Download statically linked cfssljson binary
+  become: yes
   get_url:
     url: https://pkg.cfssl.org/{{cfssl_version}}/cfssljson_linux-amd64
     dest: "{{cfssl_bin_directory}}/cfssljson"

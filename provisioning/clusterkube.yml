@@ -203,5 +203,5 @@
   - name: start <role> | call coreDNS
     tags: ['coredns']
     import_role:
-        name: rok.kube-network/coredns
+        name: rok.kube-network/coreDNS
         tasks_from: coreDNS
