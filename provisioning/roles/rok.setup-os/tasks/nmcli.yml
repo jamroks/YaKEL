@@ -6,7 +6,8 @@
       state: present
     with_items: 
       - libsemanage-python
-      - NetworkManager-glib
+      - NetworkManager-libnm
+        #- NetworkManager-glib
       - policycoreutils-python
       # - nm-connection-editor.x86_64
 

@@ -151,7 +151,7 @@ By typing the following we should get a response from kubernetes apiserver
 .check cluster-infos
 [source, shell,linenums]
 ----
-$ ./kubectl --kubeconfig kubectl.kubeconfig cluster-infos <1>
+$ ./kubectl --kubeconfig kubectl.kubeconfig cluster-info <1>
 ----
 
 
